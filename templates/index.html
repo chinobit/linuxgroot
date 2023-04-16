@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title">
+  Welcome to my website.
+</h1>
+</br>
+<p>Click <a href="{{ get_url(path='@/resume/_index.md') }}">here</a> to see my resume.</p>
+</br>
+<p>Click <a href="{{ get_url(path='@/blog/2023/_index.md') }}">here</a> to see my posts.</p>
+{% endblock content %}
