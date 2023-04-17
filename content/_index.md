@@ -1,15 +1,15 @@
 +++
-title = "Modern Documentation Theme"
+title = "We are Groot!"
 
 
 # The homepage contents
 [extra]
-lead = '<b>AdiDoks</b> is a modern documentation theme, which is a port of the Hugo theme <a href="https://github.com/h-enk/">Doks</a> for Zola.'
+lead = '<b>Welcome</b> to my website.'
 url = "/docs/getting-started/introduction/"
-url_button = "Get started"
-repo_version = "GitHub v0.1.0"
-repo_license = "Open-source MIT License."
-repo_url = "https://github.com/aaranxu/adidoks"
+url_button = "whoami"
+repo_version = ""
+repo_license = ""
+repo_url = "https://github.com/chinobit/linuxgroot"
 
 # Menu items
 [[extra.menu.main]]
