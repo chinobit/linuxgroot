@@ -9,6 +9,7 @@ insert_anchor_links = "left"
 tags = ["slurm", "hpc", "scheduling", "gpu"]
 
 [extra]
+social_media_card = "/social_cards/blog-scheduler-why-your-job-is-pending.png"
 katex = true
 toc = true
 +++

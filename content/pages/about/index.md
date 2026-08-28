@@ -3,6 +3,9 @@ title = "About"
 template = "info-page.html"
 path = "/about"
 insert_anchor_links = "left"
+
+[extra]
+social_media_card = "/social_cards/pages-about.png"
 +++
 
 I run Linux systems for a living: batch schedulers, GPU nodes, the storage and

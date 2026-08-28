@@ -5,6 +5,9 @@ description = "Migrating to Zola 0.22.1 on a theme built for 0.21: one loud fail
 
 [taxonomies]
 tags = ["zola", "static-sites", "csp", "cloudflare"]
+
+[extra]
+social_media_card = "/social_cards/blog-rebuilding-on-zola-0-22.png"
 +++
 
 This site is a static build: [Zola](https://www.getzola.org) renders Markdown into

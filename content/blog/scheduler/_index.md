@@ -7,6 +7,7 @@ transparent = true
 insert_anchor_links = "left"
 
 [extra]
+social_media_card = "/social_cards/blog-scheduler.png"
 series = true
 +++
 

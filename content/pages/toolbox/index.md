@@ -6,6 +6,7 @@ description = "Copy-paste diagnostics for Slurm jobs and GPU nodes: why a job is
 insert_anchor_links = "left"
 
 [extra]
+social_media_card = "/social_cards/pages-toolbox.png"
 toc = true
 +++
 

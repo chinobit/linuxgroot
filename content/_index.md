@@ -3,6 +3,7 @@ title = "LinuxGroot"
 sort_by = "date"
 
 [extra]
+social_media_card = "/social_cards/index.png"
 header = { title = "Platform engineering for HPC", img_alt = "LinuxGroot" }
 section_path = "blog/_index.md"
 max_posts = 5

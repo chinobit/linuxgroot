@@ -8,6 +8,7 @@ insert_anchor_links = "left"
 tags = ["ai-agents", "knowledge-management", "automation", "llm"]
 
 [extra]
+social_media_card = "/social_cards/blog-hivemind.png"
 toc = true
 +++
 
