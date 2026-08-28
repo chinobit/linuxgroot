@@ -2,7 +2,7 @@
 title = "How the scheduler sees you"
 description = "A series on batch scheduling from both sides of the queue: what the scheduler is actually optimising, and what that means for the person waiting on a job."
 template = "series.html"
-sort_by = "date"
+sort_by = "weight"
 transparent = true
 insert_anchor_links = "left"
 
@@ -18,7 +18,9 @@ was queued first, and the same script behaves differently on a Tuesday.
 
 None of that is arbitrary. This series works through what the scheduler is
 computing, in the order a person actually encounters it: first why a job waits,
-then what it costs you, then how to ask for the right thing.
+then what holding those resources actually costs you. The two halves answer each
+other, and between them they cover most of what a support ticket is really
+asking.
 
 Everything here is written against stock Slurm with common defaults. No site is
 quite like that, but the reasoning transfers, and the commands are the ones that

@@ -1,6 +1,7 @@
 +++
 title = "Why your job is still pending"
 date = 2026-08-28
+weight = 1
 description = "Fairshare is not a queue and priority is not a position. What Slurm computes while your job waits, and the three commands that tell you which part of it you are losing to."
 insert_anchor_links = "left"
 
