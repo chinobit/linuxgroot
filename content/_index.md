@@ -8,5 +8,5 @@ section_path = "blog/_index.md"
 max_posts = 5
 +++
 
-Slurm scheduling, GPU infrastructure, Linux systems. Documented from production,
-where "works on my machine" is not an available excuse.
+Slurm scheduling, GPU infrastructure, Linux systems. Everything here runs on
+open source — these notes are a small repayment.
