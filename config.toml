@@ -42,6 +42,12 @@ bottom_footnotes = true
 # which is what actually colours the code blocks; light_theme/dark_theme only decide
 # what Zola writes into the generated giallo-{light,dark}.css files, which tabi does
 # not link. Chosen to match tabi's Catppuccin-based palette in case they are ever used.
+# Both theme keys are MANDATORY: `style = "class"` on its own fails the build with
+# "data did not match any variant of untagged enum HighlightConfig" (measured on
+# 0.22.1). So the ~44 KB of unreferenced giallo CSS cannot be switched off, and it is
+# deliberately NOT deleted after the build: nothing fetches it, and a post-build `rm`
+# would silently break syntax colours the day a theme bump starts linking it.
+# scripts/verify-build.sh asserts instead that it stays unreferenced.
 [markdown.highlighting]
 style = "class"
 light_theme = "catppuccin-latte"
@@ -96,6 +102,11 @@ encode_plaintext_email = true
 copy_button = true          # ~700 B JS, copy button on code blocks
 show_reading_time = true
 show_date = true
+# "both" shows the revision date alongside the original wherever a post sets
+# `updated = YYYY-MM-DD`, and falls back to the original date alone when it does not.
+# On a reference-style site the revision date is the credibility signal: it tells a
+# reader whether the commands below were checked recently or in 2026.
+post_listing_date = "both"
 toc = true                  # ToC on posts; disable per-page with toc = false
 katex = false               # enable per-page in front matter when needed
 mermaid = false             # enable per-page; loads ~2.5 MB JS only where used

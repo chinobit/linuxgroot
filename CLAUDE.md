@@ -72,8 +72,35 @@ config.toml change, check the built artifact, not the source:
   unreferenced assets). Harmless; do not wire them up without removing tabi's own
   sass/parts/_syntax_theme.scss first, or the two will fight.
 
+## Authoring workflow — generated assets are committed, not built in CI
+Both generators run locally and their output is committed. CI stays hermetic: no npm,
+no browser, no network beyond the pinned Zola tarball. Run them before committing.
+- **New or retitled page** -> `python3 scripts/render-social-cards.py` (add `--force`
+  to regenerate all). Renders a 1200x630 card per page and writes `social_media_card`
+  into front matter. Without it the page inherits its section's card, which the build
+  gate rejects. Needs a local chromium.
+- **Edited a diagram** -> `bash scripts/render-diagrams.sh` after changing
+  `diagrams/*.mmd`; commit the `.mmd` and the generated `static/diagrams/*.svg`.
+  Browser-rendered mermaid is NOT an option: enabling it makes tabi add
+  `'unsafe-inline'` to style-src on that page, which the gate rejects.
+- **Revising a published post** -> add `updated = YYYY-MM-DD` to its front matter.
+  `post_listing_date = "both"` surfaces it; on a reference site the revision date is
+  the credibility signal.
+- **KaTeX** is safe to enable per page (`katex = true`): measured at zero CSP
+  violations. **mermaid is not.**
+
 ## Conventions
 - Content in content/blog/, tags taxonomy only. Feed: atom.xml.
+- Series live in `content/blog/<series>/` with `template = "series.html"`,
+  `series = true`, `transparent = true` (so posts still appear in /blog/ and the
+  homepage), and `sort_by = "weight"` with `weight = 1, 2, ...` on each post. Weight
+  beats date ordering here: posts often share a publication date, and tabi's date
+  route needs `paginate_by = 9999` + `paginate_reversed = true` to put chapter one
+  first. tabi shows NO series banner unless `[extra.series_intro_templates]` /
+  `[extra.series_outro_templates]` are defined in the series `_index.md`; without them
+  the series landing page is unreachable from its own posts.
+- Front-matter sub-tables (`[extra.series_intro_templates]` and friends) go BELOW every
+  bare `[extra]` key, same rule as config.toml.
 - One-line shell commands in docs and scripts. Prefer system mechanisms over ad-hoc
   workarounds. Full-file examples over partial snippets.
 - Validate config keys against upstream docs before changing:

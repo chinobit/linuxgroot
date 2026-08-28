@@ -88,12 +88,23 @@ for f in $(find public/blog -name '*.html' -type f 2>/dev/null | sort); do
         || fail "${f#public/} shows card '${got##*/}', expected '${want}.png' — it is inheriting another page's card; run scripts/render-social-cards.py"
 done
 
-# 5. HTTP-header policies shipped for Workers to serve.
+# 5. Zola always writes giallo-{light,dark}.css (the theme keys under
+#    [markdown.highlighting] are mandatory), and tabi never links them: it colours code
+#    from its own sass/parts/_syntax_theme.scss. That is fine while they stay
+#    unreferenced. If a theme bump starts linking them, two syntax stylesheets fight
+#    over the same z-* classes and the winner is whichever loads last. Catch that here
+#    rather than by noticing odd colours months later.
+if grep -rlq 'giallo-light\.css\|giallo-dark\.css' $pages 2>/dev/null; then
+    grep -rl 'giallo-light\.css\|giallo-dark\.css' $pages >&2
+    fail "a page now links Zola's giallo CSS — it will fight tabi's own _syntax_theme.scss; remove one before shipping"
+fi
+
+# 6. HTTP-header policies shipped for Workers to serve.
 [ -f public/_headers ] || fail "public/_headers missing"
 grep -q 'X-Frame-Options: DENY' public/_headers || fail "_headers lost X-Frame-Options"
 grep -q 'X-Content-Type-Options: nosniff' public/_headers || fail "_headers lost nosniff"
 
-# 6. Privacy: the built site must not contain identifying or work-related strings.
+# 7. Privacy: the built site must not contain identifying or work-related strings.
 #
 # The patterns themselves are deliberately NOT in this file. This repo is public, so a
 # literal deny-list here would publish exactly the strings it exists to suppress — which
