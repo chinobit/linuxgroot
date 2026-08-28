@@ -1,0 +1,42 @@
+# .github/workflows/deploy.yml — build with Zola, deploy to Cloudflare Workers
+#
+# Dependency chain:
+#   push to main -> checkout WITH submodules (themes/tabi is a pinned submodule;
+#   without submodules:true the theme is missing and zola build fails)
+#   -> install Zola v0.22.1 binary (pinned; same version as local dev)
+#   -> `zola build` WITHOUT --drafts: pages with draft = true never reach production
+#   -> cloudflare/wrangler-action reads wrangler.jsonc and deploys public/.
+#
+# Required repository secrets (Settings -> Secrets and variables -> Actions):
+#   CLOUDFLARE_API_TOKEN  — scoped token: Account -> Workers Scripts -> Edit, this
+#                           account only. Never the Global API Key.
+#   CLOUDFLARE_ACCOUNT_ID — from Cloudflare dashboard sidebar.
+
+name: Deploy to Cloudflare Workers
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (with theme submodule)
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install Zola
+        run: curl -sL https://github.com/getzola/zola/releases/download/v0.22.1/zola-v0.22.1-x86_64-unknown-linux-gnu.tar.gz | sudo tar xz -C /usr/local/bin
+
+      - name: Build site (drafts excluded)
+        run: zola build
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy

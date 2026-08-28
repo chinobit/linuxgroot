@@ -1,2 +1,18 @@
+# static/_headers — parsed by Workers Static Assets, never served as an asset.
+#
+# Dependency chain:
+#   Zola copies static/ verbatim into public/ at build time -> Workers reads
+#   public/_headers and attaches these headers to every static response.
+#   Covers directives that tabi's <meta http-equiv> CSP cannot express
+#   (frame-ancestors equivalent via X-Frame-Options, MIME sniffing, referrer,
+#   feature policy, cross-origin isolation).
+#   HSTS is deliberately ABSENT here: set it once in Cloudflare dashboard ->
+#   SSL/TLS -> Edge Certificates -> HSTS (avoids duplicate headers).
+
 /*
-  Access-Control-Allow-Origin: *
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin

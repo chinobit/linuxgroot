@@ -1,15 +1,28 @@
-# My Zola Website - [linuxgroot.net](https://linuxgroot.net)
+# linuxgroot.net
 
-## Install with Docker
-```
-git clone https://github.com/chinobit/linuxgroot.git
-cd linuxgroot
-```
-### Build
-`docker run -u "$(id -u):$(id -g)" -v $PWD:/app --workdir /app --rm ghcr.io/getzola/zola:v0.17.2 build`
-### Serve
-`docker run -u "$(id -u):$(id -g)" -v $PWD:/app --workdir /app -p 8080:8080 -p 1024:1024 --rm ghcr.io/getzola/zola:v0.17.2 serve --interface 0.0.0.0 --port 8080 --base-url localhost`
+Source for [linuxgroot.net](https://linuxgroot.net): a static site built with
+[Zola](https://www.getzola.org) v0.22.1 and the [tabi](https://github.com/welpo/tabi)
+theme, deployed to Cloudflare Workers Static Assets by GitHub Actions on push to `main`.
 
-> If you start from an empty local directory, you must init the app directory with a config.toml:
->
-> `docker run -u "$(id -u):$(id -g)" -v $PWD:/app --workdir /app -it --rm ghcr.io/getzola/zola:v0.17.2 init`
+The theme is a git submodule pinned to a release tag, so clone with:
+
+```
+git clone --recurse-submodules <this repo>
+```
+
+## Local preview
+
+```
+podman run -u "$(id -u):$(id -g)" -v $PWD:/app --workdir /app -p 8080:8080 --rm ghcr.io/getzola/zola:v0.22.1 serve --interface 0.0.0.0 --port 8080 --base-url localhost --drafts
+```
+
+Substitute `docker` for `podman` if that is what is installed. `--drafts` is local
+only: CI builds without it, so `draft = true` pages never reach production.
+
+## Build
+
+```
+podman run -u "$(id -u):$(id -g)" -v $PWD:/app --workdir /app --rm ghcr.io/getzola/zola:v0.22.1 build
+```
+
+See `CLAUDE.md` for the project's architecture, privacy and security constraints.

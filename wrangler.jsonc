@@ -1,0 +1,19 @@
+// wrangler.jsonc — Cloudflare Workers Static Assets, linuxgroot.net
+//
+// Dependency chain:
+//   "name" matches the existing Worker "linuxgroot" -> `wrangler deploy` REPLACES the
+//   old geolocation placeholder in-place (no orphaned Worker). "assets.directory"
+//   consumes Zola's build output (public/), which includes static/_headers for
+//   HTTP-header security policies. No "main": assets-only Worker, zero server code.
+//   Deployed by cloudflare/wrangler-action in .github/workflows/deploy.yml using a
+//   least-privilege API token (Workers Scripts:Edit only).
+{
+    "name": "linuxgroot",
+    "compatibility_date": "2026-08-01",
+    "assets": {
+        "directory": "./public"
+    },
+    "routes": [
+        { "pattern": "linuxgroot.net", "custom_domain": true }
+    ]
+}
