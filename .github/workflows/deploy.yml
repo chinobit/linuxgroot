@@ -19,17 +19,25 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Least privilege: the job only reads the repo; deploy auth is the Cloudflare token.
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (with theme submodule)
-        uses: actions/checkout@v5
+        # Pinned by commit SHA (tag: v5) — tags are mutable, SHAs are not.
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           submodules: true
 
-      - name: Install Zola
-        run: curl -sL https://github.com/getzola/zola/releases/download/v0.22.1/zola-v0.22.1-x86_64-unknown-linux-gnu.tar.gz | sudo tar xz -C /usr/local/bin
+      - name: Install Zola (checksum-verified)
+        run: |
+          curl -sL -o zola.tar.gz https://github.com/getzola/zola/releases/download/v0.22.1/zola-v0.22.1-x86_64-unknown-linux-gnu.tar.gz
+          echo "0ca09aa40376aaa9ddfb512ff9ad963262ef95edb0d0f2d5ec6961b6f5cf22ef  zola.tar.gz" | sha256sum -c -
+          sudo tar xzf zola.tar.gz -C /usr/local/bin && rm zola.tar.gz
 
       - name: Build site (drafts excluded)
         run: zola build
@@ -39,7 +47,8 @@ jobs:
         run: ./scripts/verify-build.sh
 
       - name: Deploy to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
+        # Pinned by commit SHA (tag: v3)
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd
         with:
           # wrangler-action@v3 defaults to wrangler 3.90.0, which predates assets-only
           # Workers and fails with "Missing entry-point" on a config with no `main`.

@@ -77,11 +77,9 @@ key after `[extra.hcard]` belongs to `extra.hcard` -- not to `extra`. The CSP
 settings, the table of contents, the reading time, the copy button: all of them
 landed in a sub-table nothing reads.
 
-No error. No warning. The theme simply fell back to its own defaults, and the site
-shipped with a policy including `img-src 'self' https://* data:` -- which permits
-loading an image from any host on the internet -- rather than the tightened one the
-config plainly appeared to specify. Reading the config file, the policy is right.
-Reading the rendered page, it is not.
+No error. No warning. The theme simply fell back to its own defaults and shipped a
+much looser policy than the one the config plainly appeared to specify. Reading the
+config file, the policy is right. Reading the rendered page, it is not.
 
 The rule that falls out of this: put every bare key before the first sub-table, and
 verify the policy from the built artifact rather than the source that was supposed to
@@ -93,21 +91,3 @@ grep -o 'Content-Security-Policy[^>]*' public/index.html
 
 Which is the same rule as the previous section, and honestly the same rule as most
 sections. Exit code zero is not evidence. The artifact is evidence.
-
-## Where headers actually live
-
-One structural note, since the CSP came up. A `<meta http-equiv>` CSP covers
-resource-loading directives, but it cannot express `frame-ancestors` -- that
-directive is ignored in `<meta>` by specification -- and it has no business carrying
-HSTS. So the split here is three places, each holding the directives that are
-enforceable there:
-
-- `<meta>` CSP from the theme: `default-src`, `script-src`, `style-src`, `img-src`.
-- `static/_headers`, copied verbatim into `public/` and read by Workers:
-  `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`,
-  `Permissions-Policy`, the cross-origin isolation pair.
-- HSTS in the Cloudflare edge configuration, set once, so nothing can emit a
-  duplicate `Strict-Transport-Security`.
-
-Three places is one more than anyone wants. Each directive lives where it is actually
-enforced.

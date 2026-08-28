@@ -1,0 +1,8 @@
+# Weekly PRs for action updates; SHA-pinned uses: lines are updated by these PRs,
+# which is the only sanctioned way the pins move.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
