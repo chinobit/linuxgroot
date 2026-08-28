@@ -56,19 +56,40 @@ inline `style=` attributes in rendered posts.
    `curl -sI https://linuxgroot.net | grep -Ei 'x-frame|nosniff|referrer|permissions'`.
 4. Decide the private/authenticated section design (see below).
 
+## Cloudflare platform findings (verified via Cloudflare MCP, 2026-08-28)
+- The Cloudflare MCP connector is already authenticated and working — nothing to enable.
+- The account holds exactly one Worker: `linuxgroot`, created 2023-04-17. That is the
+  geolocation placeholder, which the first successful deploy overwrites in place.
+- **There is no Pages project to migrate from.** wrangler.jsonc is already in the exact
+  end state Cloudflare's Pages-to-Workers guide targets: assets-only
+  (`"assets": {"directory": "./public"}`, no `main`), deployed with `wrangler deploy`,
+  never `wrangler pages deploy`. Nothing to do. (Caveat: the available MCP tools list
+  Workers, not Pages projects, so this rests on the guide's criteria plus the Worker
+  listing rather than a direct Pages enumeration.)
+- CI is green through `zola build`; the only failing step is the Cloudflare deploy,
+  for lack of secrets. Run 33165472226 is the evidence.
+
 ## Open questions
 - Skin: currently "teal". "monochrome" is the other candidate.
 - Publish a base64-encoded email in the footer? Currently omitted entirely.
 - Content plan beyond the inaugural post.
 
 ## Proposed: authenticated private section
-Requested this session. The recommended design keeps the site fully static and adds
-**no auth code**: put Cloudflare Access (Zero Trust) in front of a path.
+Requested this session. Confirmed against Cloudflare's docs: the design keeps the site
+fully static and adds **no auth code**. Put Cloudflare Access (Zero Trust) in front of
+a path by creating a **self-hosted application** whose application domain is the path.
 
-- Access sits at the edge, in front of the Worker. An unauthenticated request to
-  `linuxgroot.net/private/*` never reaches the assets at all.
-- Identity via one-time email PIN, or Google/GitHub as an IdP. Free tier covers 50 users.
+- Zero Trust > Access > Applications > self-hosted, domain `linuxgroot.net/private`.
+  Access runs at the edge before the Worker, so an unauthenticated request to
+  `/private/*` never reaches the assets.
+- Policy: allow by email address (a fixed allowlist) or by email domain. Login via
+  one-time email PIN needs no IdP at all. Free tier covers 50 users.
+- Prerequisite: Zero Trust must be enabled on the account first.
 - No change to wrangler.jsonc, no `main` script, no session code to get wrong.
+- Note the alternative Cloudflare now offers — attaching Access to the *Worker* rather
+  than a hostname — which covers every route and preview URL automatically. That is the
+  better choice if the whole site should be private, and the wrong one here, since only
+  `/private/*` should require sign-in.
 
 Two decisions needed before implementing:
 - **Where private files live.** Simplest is `content/private/` built into `public/` and
