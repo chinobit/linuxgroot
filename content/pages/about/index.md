@@ -27,17 +27,6 @@ afternoon once somebody writes the thing down.
 So the posts here try to work from both directions: what the system is really
 computing, and what that means for the person waiting on it.
 
-## What is not here
-
-Everything on this site is written generically, on purpose. Nothing about any
-particular employer, cluster, hostname or internal practice appears here, and
-nothing will. The techniques travel between sites perfectly well; the specifics
-belong to the people who run them.
-
-That constraint has been good for the writing. It forces each post to be about
-the mechanism rather than the anecdote, which is the part that was worth reading
-anyway.
-
 ## Colophon
 
 This site is static and deliberately boring: Markdown rendered by
