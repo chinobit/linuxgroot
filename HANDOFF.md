@@ -70,23 +70,16 @@ includeSubDomains will apply to it once it exists.
 - Zero Trust: 50 free seats, one self-hosted Access application gating files.linuxgroot.net.
 - R2 public development URL disabled.
 
-## Cloudflare platform findings (verified via Cloudflare MCP, 2026-08-28)
-- The Cloudflare MCP connector is already authenticated and working — nothing to enable.
-- The account holds exactly one Worker: `linuxgroot`, created 2023-04-17. That is the
-  geolocation placeholder, which the first successful deploy overwrites in place.
-- **There is no Pages project to migrate from.** wrangler.jsonc is already in the exact
-  end state Cloudflare's Pages-to-Workers guide targets: assets-only
-  (`"assets": {"directory": "./public"}`, no `main`), deployed with `wrangler deploy`,
-  never `wrangler pages deploy`. Nothing to do. (Caveat: the available MCP tools list
-  Workers, not Pages projects, so this rests on the guide's criteria plus the Worker
-  listing rather than a direct Pages enumeration.)
-- CI is green through `zola build`. The deploy step failed, but NOT for lack of
-  secrets as first assumed — run 33165472226 shows
-  `Missing entry-point: ... or the \`main\` config field`. cloudflare/wrangler-action@v3
-  defaults to wrangler 3.90.0, which predates assets-only Workers; those need
-  wrangler v4+. Fixed by pinning `wranglerVersion: '4.127.0'` in the workflow.
-  The secrets are still absent, so the next run will fail on authentication instead —
-  that is the expected state until step 2 below is done.
+## Cloudflare platform findings (2026-08-28, corrected)
+- The account now holds one Worker, `linuxgroot`, serving the site as assets-only
+  (no `main`) — the end state Cloudflare's Pages-to-Workers guide targets.
+- An earlier finding here claimed "there is no Pages project to migrate from". That
+  was wrong: workers_list does not enumerate Pages projects, and a Pages project in
+  fact owned the apex and served the old AdiDoks build until the owner deleted it.
+  Lesson recorded: absence from one API listing is not absence from the account.
+- cloudflare/wrangler-action@v3 defaults to wrangler 3.90.0, which predates
+  assets-only Workers and fails with "Missing entry-point". The workflow pins
+  `wranglerVersion: '4.127.0'`.
 
 ## Open questions
 - Skin: currently "teal". "monochrome" is the other candidate.
