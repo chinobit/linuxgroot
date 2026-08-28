@@ -28,14 +28,28 @@ site was never finished and is being fully replaced.
   CLOUDFLARE_ACCOUNT_ID. GitHub Actions secrets only, never committed.
 
 ## Hard constraints — do not change without explicit approval
-- Privacy: repo is private (it was found PUBLIC on 2026-08-28 and switched; see
-  HANDOFF.md for the residual-exposure follow-ups). show_remote_source/show_remote_changes stay false;
-  remote_repository_url stays unset. No comment backends, no webmentions,
-  hcard disabled. Public author identity is the handle "LinuxGroot".
+- Privacy: **this repo is PUBLIC** (decision 2026-08-28, after rewriting author
+  metadata to remove a real name from history). The operative rule is therefore
+  absolute: nothing identity-bearing may ever enter this repo. No real name, no
+  personal email, no employer, institution or hostname, no internal URLs. Commit as
+  LinuxGroot <31506370+chinobit@users.noreply.github.com>; the repo-local git identity
+  is already set, but verify with `git log -1 --format='%an <%ae>'` before pushing.
+  Private files belong in the R2 bucket, never in a commit.
+  show_remote_source/show_remote_changes stay false and remote_repository_url stays
+  unset regardless: the site does not advertise its own source.
+  No comment backends, no webmentions, hcard disabled. Public identity is "LinuxGroot".
 - Analytics: Cloudflare Web Analytics is ENABLED by explicit decision on 2026-08-28,
   relaxing the previous "no analytics" rule. It is cookieless and free. The cost is
   that script-src is no longer pure 'self' — see the allowed_domains note in
   config.toml. It remains the ONLY third-party script permitted; do not add others.
+- HSTS: max-age 6 months with includeSubDomains, **preload OFF** (decision 2026-08-28).
+  Do not enable the preload token without also raising max-age to 12 months and
+  deliberately submitting to hstspreload.org; that step binds every subdomain of
+  linuxgroot.net to valid HTTPS effectively permanently and takes months to undo.
+- AI bots (Cloudflare Security Settings > Configure AI bot policies, from 2026-09-15):
+  Training = Block all pages, Agent = Block all pages, Search = Allow. Managed
+  robots.txt on. The site stays indexable and discoverable while refusing training
+  scrapes. Cloudflare merges its managed robots.txt with the one Zola generates.
 - Security: enable_csp = true with the tightened allowed_domains in config.toml
   (self-hosted assets only; img-src does NOT allow https://*). HTTP-only headers
   live in static/_headers; HSTS is set in the Cloudflare dashboard (SSL/TLS ->

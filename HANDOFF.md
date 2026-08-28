@@ -30,56 +30,34 @@ Verified from the built artifact, not the source: CSP is now
 style-src 'self'; connect-src 'self'; script-src 'self'` with no frame-src, and zero
 inline `style=` attributes in rendered posts.
 
-### Privacy remediation
-- **The GitHub repo was PUBLIC.** CLAUDE.md asserted it was private; it was not.
-  Switched to private on 2026-08-28.
-- Scrubbed from tracked files: LICENSE copyright (real name -> "LinuxGroot"), README
-  (removed the repo URL and stale Zola 0.17.2 commands), static/site.webmanifest
-  (was branded "Zola Theme AdiDoks").
-- Repo-local git identity set to LinuxGroot <31506370+chinobit@users.noreply.github.com>
-  so future commits carry no real name or personal email.
-
-## BLOCKER: apex DNS owns linuxgroot.net, so the custom domain cannot attach
-Deploy run 33174379852 (2026-08-28): the API token authenticated, wrangler v4 accepted
-the assets-only config, and the Worker version uploaded (its modified_on updated). The
-custom-domain trigger then failed:
-
-    Hostname 'linuxgroot.net' already has externally managed DNS records (A, CNAME, etc).
-    Delete them first or try a different hostname. [code: 100117]
-
-The apex currently resolves to proxied Cloudflare A records (104.21.40.245,
-172.67.140.100) and still serves the OLD AdiDoks content, including the
-`access-control-allow-origin: *` header from the deleted AdiDoks static/_headers.
-
-**This corrects the earlier "there is no Pages project to migrate from" finding.** That
-rested on workers_list, which does not enumerate Pages projects. Something already owns
-this hostname and serves the old build; a Cloudflare Pages project is the most likely
-owner. The available MCP tools cannot list Pages, so this must be checked in the
-dashboard under Workers & Pages.
-
-Fix (dashboard, one of):
-- If a Pages project owns it: remove the custom domain linuxgroot.net from that project,
-  which deletes its DNS record. Consider deleting the project once the Worker serves.
-- Otherwise: DNS > Records, delete the apex A records for linuxgroot.net.
-Then re-run the deploy. Wrangler creates its own managed record for the custom domain.
-Expect a brief outage between deleting the record and the deploy attaching the Worker.
+### Privacy and identity
+This repo is public. Author metadata across all history was rewritten to
+LinuxGroot <31506370+chinobit@users.noreply.github.com>, and LICENSE, README and
+site.webmanifest carry the handle only. The standing rule is in CLAUDE.md: nothing
+identity-bearing enters this repo, ever. Private files live in the R2 bucket.
 
 ## Next steps (in order)
-1. **Decide on the residual public exposure.** While the repo was public, the real name
-   and personal email were visible in LICENSE and in all five commit author fields.
-   Making it private stops new exposure but does not retract what was already fetched,
-   forked, or indexed. Options: leave it (history is only visible to collaborators now),
-   or rewrite author metadata with `git filter-repo --mailmap` and force-push. The
-   second is destructive and changes every commit SHA — your call, not the agent's.
-2. Manual dashboard work, not scriptable here:
-   - Create scoped Cloudflare API token (Workers Scripts:Edit, this account only).
-   - Add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as GitHub Actions secrets.
-     Confirmed absent as of this session; the deploy step cannot succeed without them.
-   - Enable HSTS in Cloudflare SSL/TLS -> Edge Certificates (max-age >= 6 months,
-     includeSubDomains, no preload yet).
-3. First real deploy: once secrets exist, push to main and verify
-   `curl -sI https://linuxgroot.net | grep -Ei 'x-frame|nosniff|referrer|permissions'`.
-4. Decide the private/authenticated section design (see below).
+1. **Unblock the deploy.** Free the apex hostname (see the BLOCKER section above), then
+   re-run the workflow. Everything else in the pipeline is already proven green.
+2. After the first successful deploy, verify from outside:
+   - `curl -sI https://linuxgroot.net | grep -Ei 'x-frame|nosniff|referrer|permissions'`
+   - the old `access-control-allow-origin: *` header is gone
+   - `curl -s https://linuxgroot.net/ | grep -c 'beacon.min.js'` is 1 once Web Analytics
+     is enabled, and the browser console shows no CSP violation for it
+3. Cloudflare dashboard, per the decisions recorded in CLAUDE.md:
+   - SSL/TLS > Edge Certificates > HSTS: turn **preload off**, keep 6 months and
+     includeSubDomains.
+   - Security Settings > Configure AI bot policies (available from 2026-09-15):
+     Training = Block all pages, Agent = Block all pages, Search = Allow. Turn on the
+     managed robots.txt preference.
+   - Analytics & Logs > Web Analytics: add linuxgroot.net, automatic setup.
+
+## Done, verified
+- Cloudflare API token authenticates and wrangler v4 uploads the Worker version.
+- HSTS live at max-age 15552000 with includeSubDomains.
+- Zero Trust: 50 free seats, one self-hosted Access application.
+- R2 public development URL disabled.
+- CSP emitted from the built artifact matches the intended policy.
 
 ## Cloudflare platform findings (verified via Cloudflare MCP, 2026-08-28)
 - The Cloudflare MCP connector is already authenticated and working — nothing to enable.
