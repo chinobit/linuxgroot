@@ -4,6 +4,21 @@
 Personal technical blog for linuxgroot.net. Complete rebuild — the old AdiDoks-based
 site was never finished and is being fully replaced.
 
+## Agent knowledge base (AGENT_KB)
+This repo may have a knowledge base attached through the generic `AGENT_KB`
+environment variable. The contract, in precedence order:
+- **This repo's own instructions win.** Anything here overrides the attached KB's
+  equivalent. A KB supplies the personal layer (prior decisions, working preferences),
+  never this project's procedures.
+- **When `AGENT_KB` is set**, read that KB's own agent instructions (its `AGENTS.md`)
+  before any other file in it.
+- **When it is unset, skip the KB entirely.** This file is sufficient on its own; no
+  step here may depend on a KB being present.
+- **Only the variable name is committed, never a value.** The KB path is per-machine
+  and lives in `.claude/settings.local.json`, which is gitignored — it is an absolute
+  home path, and this repo is public. Do not commit it, and do not name a specific KB,
+  path or host anywhere in this repo.
+
 ## Stack & architecture
 - Zola v0.22.1 (static site generator), pinned everywhere — CI binary, local container.
   Zola 0.22 is a breaking release: it replaced the syntect highlighter with giallo and

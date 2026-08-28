@@ -5,3 +5,9 @@ public
 *.scss.map
 .mermaid-config.json
 *.code-workspace
+
+# Per-machine agent settings. Holds the local filesystem path to the attached
+# knowledge base (AGENT_KB), which is an absolute home path — exactly the kind
+# of identity-bearing string that must never enter this public repo. The repo
+# commits only the generic variable NAME, never a value.
+.claude/settings.local.json

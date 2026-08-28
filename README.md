@@ -25,4 +25,18 @@ only: CI builds without it, so `draft = true` pages never reach production.
 podman run -u "$(id -u):$(id -g)" -v $PWD:/app --workdir /app --rm ghcr.io/getzola/zola:v0.22.1 build
 ```
 
+After building, `scripts/verify-build.sh` checks the emitted `public/` artifact
+(CSP, headers, no inline styles, no off-site subresources, every post has its own
+social card, no identity-bearing strings). CI runs it before every deploy; a
+successful `zola build` alone does not prove any of that held.
+
+## Authoring workflow
+
+Two generators run locally and their output is committed, so CI stays hermetic:
+
+- New or retitled page: `python3 scripts/render-social-cards.py` (needs a local
+  Chromium) to render its Open Graph card and set `social_media_card` in front matter.
+- Edited a diagram: `bash scripts/render-diagrams.sh` after changing `diagrams/*.mmd`,
+  then commit the `.mmd` and the generated `static/diagrams/*.svg`.
+
 See `CLAUDE.md` for the project's architecture, privacy and security constraints.
