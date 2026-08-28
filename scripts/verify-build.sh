@@ -1,37 +1,94 @@
 #!/usr/bin/env bash
-# Verify security invariants in the BUILT artifact (public/), not the config.
-# Exists because every security bug this project has had built successfully:
-# the config said one thing and the emitted site said another. Run after `zola build`;
-# CI runs it before deploy and fails the pipeline on drift.
+# Verify security and privacy invariants in the BUILT artifact (public/), not the config.
+# Exists because every security bug this project has had built successfully: the config
+# said one thing and the emitted site said another. Run after `zola build`; CI runs it
+# before deploy and fails the pipeline on drift.
+#
+# Scope note: these checks run over EVERY generated page. tabi resolves several settings
+# per page, so a single page can carry a weaker policy than the homepage. Checking only
+# index.html cannot see that.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 fail() { echo "FAIL: $1" >&2; exit 1; }
 
 [ -f public/index.html ] || fail "public/index.html missing — build first"
 
-# 1. CSP is emitted and matches the intended policy exactly.
-csp=$(grep -o 'default-src[^"]*' public/index.html | head -1) || fail "no CSP meta tag emitted"
-echo "CSP: $csp"
-case "$csp" in *"https://*"*) fail "img-src wildcard (https://*) leaked into CSP — the extra.hcard ordering bug is back";; esac
-case "$csp" in *unsafe-inline*) fail "unsafe-inline in CSP";; esac
-case "$csp" in *"img-src 'self' data:"*) ;; *) fail "img-src is not exactly 'self' data:";; esac
-case "$csp" in *"style-src 'self'"*) ;; *) fail "style-src is not 'self'";; esac
+pages=$(find public -name '*.html' -type f | sort)
+[ -n "$pages" ] || fail "no HTML pages found in public/"
+echo "checking $(printf '%s\n' "$pages" | wc -l) pages"
 
-# 2. Class-based highlighting: zero inline style ATTRIBUTES in rendered posts.
+# 1. Content-Security-Policy: present on every page, and never weaker than intended.
+#    Asserted as properties rather than one exact string: tabi appends 'self' to some
+#    directives situationally (e.g. font-src on KaTeX pages), which is harmless, while
+#    'unsafe-inline' and wildcard hosts are not.
+for f in $pages; do
+    # Zola emits a meta-refresh stub for .../page/1/. It carries no content, no script
+    # and no CSP by design; the page it redirects to is checked like any other.
+    if grep -q 'http-equiv=refresh' "$f" && grep -q '<title>Redirect</title>' "$f"; then
+        continue
+    fi
+    csp=$(grep -o "default-src[^\"]*" "$f" | head -1 || true)
+    [ -n "$csp" ] || fail "no CSP emitted on ${f#public/}"
+    case "$csp" in *"https://*"*) fail "wildcard host (https://*) in CSP on ${f#public/} — the extra.hcard ordering bug is back";; esac
+    # 'unsafe-inline' would be silently added by enabling mermaid or a comment backend
+    # on a single page. Measured 2026-08-28: mermaid = true relaxes style-src page-wide.
+    case "$csp" in *unsafe-inline*) fail "unsafe-inline in CSP on ${f#public/} — a page-level feature (mermaid? comments?) relaxed the policy";; esac
+    case "$csp" in *unsafe-eval*) fail "unsafe-eval in CSP on ${f#public/}";; esac
+    case "$csp" in *"img-src 'self' data:"*) ;; *) fail "img-src is not 'self' data: on ${f#public/}";; esac
+    case "$csp" in *"style-src 'self'"*) ;; *) fail "style-src does not start at 'self' on ${f#public/}";; esac
+done
+echo "CSP (homepage): $(grep -o "default-src[^\"]*" public/index.html | head -1)"
+
+# 2. Class-based highlighting: zero inline style ATTRIBUTES anywhere.
 # Match style= only inside a tag (after < and before >), so prose or code spans that
 # merely mention the string do not trip the gate.
-if grep -rlqE '<[a-zA-Z][^>]*[[:space:]]style=' public/blog/*/index.html 2>/dev/null; then
-  fail "inline style= attribute in a post — highlighting fell back to inline mode"
+if grep -rlqE '<[a-zA-Z][^>]*[[:space:]]style=' $pages 2>/dev/null; then
+  echo "offending pages:" >&2
+  grep -rlE '<[a-zA-Z][^>]*[[:space:]]style=' $pages >&2 || true
+  fail "inline style= attribute in a page — highlighting fell back to inline mode, or a shortcode emitted one"
 fi
 
-# 3. HTTP-header policies shipped for Workers to serve.
+# 3. No off-site subresources. The CSP would block these at runtime, which means the
+#    feature silently does nothing rather than failing loudly. The known trap is the
+#    theme's serve_local_mermaid default flipping to a jsDelivr CDN URL on a bump.
+#    Cloudflare's analytics beacon is the one permitted exception (see config.toml).
+# Anchors in prose legitimately point off-site, so only subresource-bearing tags are
+# examined: script, link, img, iframe.
+offsite=$(grep -rhoE '<(script|link|img|iframe)[^>]*>' $pages \
+    | grep -oE '(src|href)="?https?://[^" >]*' \
+    | grep -vE '="?https?://(linuxgroot\.net|static\.cloudflareinsights\.com)' \
+    | sort -u || true)
+if [ -n "$offsite" ]; then
+  printf '%s\n' "$offsite" >&2
+  fail "off-site subresource in built output — the CSP would block it at runtime and the feature would fail silently"
+fi
+
+# 4. HTTP-header policies shipped for Workers to serve.
 [ -f public/_headers ] || fail "public/_headers missing"
 grep -q 'X-Frame-Options: DENY' public/_headers || fail "_headers lost X-Frame-Options"
 grep -q 'X-Content-Type-Options: nosniff' public/_headers || fail "_headers lost nosniff"
 
-# 4. Identity: the built site must never contain the owner's real identity.
-if grep -rilq -e 'ray bitton' -e 'raybit10' public/; then
-  fail "identity-bearing string in built output"
+# 5. Privacy: the built site must not contain identifying or work-related strings.
+#
+# The patterns themselves are deliberately NOT in this file. This repo is public, so a
+# literal deny-list here would publish exactly the strings it exists to suppress — which
+# is what this script did until 2026-08-28. Patterns come from outside the repo:
+#   local: ~/.config/linuxgroot/leak-patterns   (one POSIX basic regex per line)
+#   CI:    $LEAK_PATTERNS_FILE, written from a GitHub Actions secret
+# Only file names and match counts are ever printed, never a matched line.
+patterns="${LEAK_PATTERNS_FILE:-$HOME/.config/linuxgroot/leak-patterns}"
+if [ -f "$patterns" ] && [ -s "$patterns" ]; then
+    hits=$(grep -rlif "$patterns" public/ | grep -v '^public/search_index' || true)
+    if [ -n "$hits" ]; then
+        echo "files containing a forbidden pattern:" >&2
+        printf '%s\n' "$hits" >&2
+        fail "identity- or work-bearing string in built output ($(printf '%s\n' "$hits" | wc -l) file(s))"
+    fi
+    echo "leak scan: clean against $(grep -cve '^[[:space:]]*$' "$patterns") pattern(s)"
+elif [ "${CI:-}" = "true" ]; then
+    fail "leak-pattern file missing in CI — set the LEAK_PATTERNS secret or unset this gate deliberately"
+else
+    echo "WARNING: no leak-pattern file at $patterns — privacy scan SKIPPED" >&2
 fi
 
 echo "OK: all build invariants hold"

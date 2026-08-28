@@ -43,8 +43,18 @@ jobs:
         run: zola build
 
       # Gate on the artifact, not the config: every security bug so far built green.
-      - name: Verify build invariants (CSP, headers, identity)
-        run: ./scripts/verify-build.sh
+      # LEAK_PATTERNS holds the identity/work strings that must never appear in the
+      # built site. It is a secret because this repo is public: a literal deny-list in
+      # the tracked script would publish the very strings it exists to suppress.
+      # The script fails closed when CI is set and the file is missing or empty.
+      - name: Verify build invariants (CSP, headers, privacy)
+        env:
+          LEAK_PATTERNS: ${{ secrets.LEAK_PATTERNS }}
+        run: |
+          if [ -n "$LEAK_PATTERNS" ]; then
+            printf '%s\n' "$LEAK_PATTERNS" > "$RUNNER_TEMP/leak-patterns"
+          fi
+          LEAK_PATTERNS_FILE="$RUNNER_TEMP/leak-patterns" ./scripts/verify-build.sh
 
       - name: Deploy to Cloudflare Workers
         # Pinned by commit SHA (tag: v3)
