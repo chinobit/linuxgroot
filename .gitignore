@@ -4,3 +4,4 @@ public
 *.sass.map
 *.scss.map
 .mermaid-config.json
+*.code-workspace
