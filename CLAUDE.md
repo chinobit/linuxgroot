@@ -16,6 +16,12 @@ site was never finished and is being fully replaced.
 - Hosting: Cloudflare Workers Static Assets. Worker name `linuxgroot` (replaces the
   old geolocation placeholder in the same slot). Config in wrangler.jsonc:
   assets-only (no `main`), directory ./public, custom_domain route linuxgroot.net.
+- Private files: R2 bucket `linuxgroot-p` (EEUR, Standard) on custom domain
+  files.linuxgroot.net, gated by a Cloudflare Access self-hosted application. This is
+  deliberately OUTSIDE the Zola build: private content never enters git, public/, the
+  sitemap, or search_index.en.js. Do not add a `content/private/` section instead —
+  build_search_index would publish its text at /search_index.en.js unauthenticated.
+  The bucket's r2.dev Public Development URL must stay DISABLED; it bypasses Access.
 - CI/CD: .github/workflows/deploy.yml — push to main -> checkout with submodules ->
   install Zola v0.22.1 -> `zola build` (never pass --drafts) -> wrangler-action deploy.
 - Secrets: CLOUDFLARE_API_TOKEN (scoped: Workers Scripts:Edit, this account only),
@@ -24,8 +30,12 @@ site was never finished and is being fully replaced.
 ## Hard constraints — do not change without explicit approval
 - Privacy: repo is private (it was found PUBLIC on 2026-08-28 and switched; see
   HANDOFF.md for the residual-exposure follow-ups). show_remote_source/show_remote_changes stay false;
-  remote_repository_url stays unset. No comment backends, no webmentions, no
-  analytics, hcard disabled. Public author identity is the handle "LinuxGroot".
+  remote_repository_url stays unset. No comment backends, no webmentions,
+  hcard disabled. Public author identity is the handle "LinuxGroot".
+- Analytics: Cloudflare Web Analytics is ENABLED by explicit decision on 2026-08-28,
+  relaxing the previous "no analytics" rule. It is cookieless and free. The cost is
+  that script-src is no longer pure 'self' — see the allowed_domains note in
+  config.toml. It remains the ONLY third-party script permitted; do not add others.
 - Security: enable_csp = true with the tightened allowed_domains in config.toml
   (self-hosted assets only; img-src does NOT allow https://*). HTTP-only headers
   live in static/_headers; HSTS is set in the Cloudflare dashboard (SSL/TLS ->
@@ -58,6 +68,26 @@ config.toml change, check the built artifact, not the source:
 - Zola writes giallo-{light,dark}.css into public/ that tabi never links (~44 KB of
   unreferenced assets). Harmless; do not wire them up without removing tabi's own
   sass/parts/_syntax_theme.scss first, or the two will fight.
+
+## Cost and plan register — alert before exceeding
+Standing instruction from the owner: flag anything that is not free-tier, not in the
+current subscription, or approaching a free monthly limit. Everything in use today is
+free. Verified 2026-08-28.
+
+| Feature | Plan | Free allowance | Current use |
+| --- | --- | --- | --- |
+| Workers Static Assets | Workers Free | Requests to static assets are free and unlimited. The 100k/day cap applies to Worker *invocations*, and this Worker has no `main`, so it has none. Limits that do bite: 20,000 asset files per version, 25 MiB per file. | Site is far under both |
+| R2 | Free tier | 10 GB-month, 1M Class A, 10M Class B ops. Egress always free. | Bucket `linuxgroot-p`, near-empty |
+| Zero Trust Access | Free | Seat count not verified from docs in this session — confirm on the Zero Trust plans page before adding users | 1 self-hosted app, 1 user |
+| DNS, DNSSEC, SSL, HSTS, Always Use HTTPS | Free | n/a | Enabled |
+| Bot Fight Mode | Free | n/a | Enabled |
+| AI bot blocking / AI Crawl Control | Free | n/a | Enabled |
+| Web Analytics | Free | Unsampled data retained 7 days, then aggregated to ~10% | Enabled |
+| GitHub Actions | Free (private repo) | 2,000 min/month. Build is ~40 s/run. Note: making the repo private started this meter; public repos are unmetered. | Negligible |
+
+NOT enabled and NOT free — do not turn these on without a plan change:
+WAF Managed Rules (Pro+), Super Bot Fight Mode (Pro+), Bot Management (Enterprise),
+Argo Smart Routing, Workers Paid ($5/mo), R2 Infrequent Access (no free tier).
 
 ## Conventions
 - Content in content/blog/, tags taxonomy only. Feed: atom.xml.

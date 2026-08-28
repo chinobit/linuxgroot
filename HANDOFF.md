@@ -79,28 +79,18 @@ inline `style=` attributes in rendered posts.
 - Publish a base64-encoded email in the footer? Currently omitted entirely.
 - Content plan beyond the inaugural post.
 
-## Proposed: authenticated private section
-Requested this session. Confirmed against Cloudflare's docs: the design keeps the site
-fully static and adds **no auth code**. Put Cloudflare Access (Zero Trust) in front of
-a path by creating a **self-hosted application** whose application domain is the path.
+## Private section: BUILT and verified (2026-08-28)
+R2 bucket `linuxgroot-p` (EEUR, Standard) on custom domain files.linuxgroot.net, behind
+a Cloudflare Access self-hosted application. No Worker code, no repo changes: private
+files never enter git, public/, the sitemap, or the search index.
 
-- Zero Trust > Access > Applications > self-hosted, domain `linuxgroot.net/private`.
-  Access runs at the edge before the Worker, so an unauthenticated request to
-  `/private/*` never reaches the assets.
-- Policy: allow by email address (a fixed allowlist) or by email domain. Login via
-  one-time email PIN needs no IdP at all. Free tier covers 50 users.
-- Prerequisite: Zero Trust must be enabled on the account first.
-- No change to wrangler.jsonc, no `main` script, no session code to get wrong.
-- Note the alternative Cloudflare now offers — attaching Access to the *Worker* rather
-  than a hostname — which covers every route and preview URL automatically. That is the
-  better choice if the whole site should be private, and the wrong one here, since only
-  `/private/*` should require sign-in.
+Verified from outside: an unauthenticated GET to both `/` and `/test.txt` returns
+302 to linuxgroot-pages.cloudflareaccess.com with `www-authenticate: Cloudflare-Access`.
 
-Two decisions needed before implementing:
-- **Where private files live.** Simplest is `content/private/` built into `public/` and
-  gated by the Access policy. That means the files are also in the git repo, and a
-  misconfigured Access policy exposes them. The safer split is an R2 bucket behind a
-  separate Access-protected route, so private files never enter the repo or the static
-  build at all. R2 is the recommendation if the content is genuinely sensitive.
-- **Who gets in.** A fixed email allowlist, or a domain rule.
-Do not build this until both are answered.
+Still to confirm in the dashboard (cannot be read via the MCP tools):
+- R2 > linuxgroot-p > Settings > **Public Development URL must show Disabled**. If it is
+  enabled, the bucket is reachable at its pub-*.r2.dev address and **Access is bypassed
+  entirely**. This is the single most important check on this setup.
+- Bucket root listing is not supported, so link objects directly.
+
+Upload with: `wrangler r2 object put linuxgroot-p/<key> --file <path> --remote`

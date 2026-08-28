@@ -97,12 +97,19 @@ mermaid = false             # enable per-page; loads ~2.5 MB JS only where used
 # it falls back to default-src 'self' (no Vimeo/YouTube embeds).
 # HTTP-header-only directives (frame-ancestors, HSTS) cannot be set from <meta>; they
 # live in static/_headers and the Cloudflare SSL/TLS HSTS panel instead.
+# script-src is NOT pure 'self': Cloudflare Web Analytics was enabled by explicit
+# decision on 2026-08-28, and its beacon is edge-injected into every page. Without
+# this entry the meta CSP blocks it and analytics silently collects nothing.
+# The beacon posts to the same-origin /cdn-cgi/rum endpoint (automatic injection on a
+# proxied zone). Do NOT add connect-src here: tabi emits connect-src 'self' on its own,
+# and a second entry produces a duplicate token and an empty ;; directive.
+# Removing Web Analytics means removing this entry too.
 enable_csp = true
 allowed_domains = [
     { directive = "font-src", domains = ["'self'", "data:"] },
     { directive = "img-src", domains = ["'self'", "data:"] },
     { directive = "media-src", domains = ["'self'"] },
-    { directive = "script-src", domains = ["'self'"] },
+    { directive = "script-src", domains = ["'self'", "https://static.cloudflareinsights.com/beacon.min.js"] },
     { directive = "style-src", domains = ["'self'"] },
 ]
 
