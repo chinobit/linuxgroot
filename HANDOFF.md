@@ -49,7 +49,7 @@ inline `style=` attributes in rendered posts.
 2. Manual dashboard work, not scriptable here:
    - Create scoped Cloudflare API token (Workers Scripts:Edit, this account only).
    - Add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as GitHub Actions secrets.
-     Confirmed absent as of this session, so CI currently fails at the deploy step.
+     Confirmed absent as of this session; the deploy step cannot succeed without them.
    - Enable HSTS in Cloudflare SSL/TLS -> Edge Certificates (max-age >= 6 months,
      includeSubDomains, no preload yet).
 3. First real deploy: once secrets exist, push to main and verify
@@ -66,8 +66,13 @@ inline `style=` attributes in rendered posts.
   never `wrangler pages deploy`. Nothing to do. (Caveat: the available MCP tools list
   Workers, not Pages projects, so this rests on the guide's criteria plus the Worker
   listing rather than a direct Pages enumeration.)
-- CI is green through `zola build`; the only failing step is the Cloudflare deploy,
-  for lack of secrets. Run 33165472226 is the evidence.
+- CI is green through `zola build`. The deploy step failed, but NOT for lack of
+  secrets as first assumed — run 33165472226 shows
+  `Missing entry-point: ... or the \`main\` config field`. cloudflare/wrangler-action@v3
+  defaults to wrangler 3.90.0, which predates assets-only Workers; those need
+  wrangler v4+. Fixed by pinning `wranglerVersion: '4.127.0'` in the workflow.
+  The secrets are still absent, so the next run will fail on authentication instead —
+  that is the expected state until step 2 below is done.
 
 ## Open questions
 - Skin: currently "teal". "monochrome" is the other candidate.
