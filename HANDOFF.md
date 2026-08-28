@@ -39,6 +39,31 @@ inline `style=` attributes in rendered posts.
 - Repo-local git identity set to LinuxGroot <31506370+chinobit@users.noreply.github.com>
   so future commits carry no real name or personal email.
 
+## BLOCKER: apex DNS owns linuxgroot.net, so the custom domain cannot attach
+Deploy run 33174379852 (2026-08-28): the API token authenticated, wrangler v4 accepted
+the assets-only config, and the Worker version uploaded (its modified_on updated). The
+custom-domain trigger then failed:
+
+    Hostname 'linuxgroot.net' already has externally managed DNS records (A, CNAME, etc).
+    Delete them first or try a different hostname. [code: 100117]
+
+The apex currently resolves to proxied Cloudflare A records (104.21.40.245,
+172.67.140.100) and still serves the OLD AdiDoks content, including the
+`access-control-allow-origin: *` header from the deleted AdiDoks static/_headers.
+
+**This corrects the earlier "there is no Pages project to migrate from" finding.** That
+rested on workers_list, which does not enumerate Pages projects. Something already owns
+this hostname and serves the old build; a Cloudflare Pages project is the most likely
+owner. The available MCP tools cannot list Pages, so this must be checked in the
+dashboard under Workers & Pages.
+
+Fix (dashboard, one of):
+- If a Pages project owns it: remove the custom domain linuxgroot.net from that project,
+  which deletes its DNS record. Consider deleting the project once the Worker serves.
+- Otherwise: DNS > Records, delete the apex A records for linuxgroot.net.
+Then re-run the deploy. Wrangler creates its own managed record for the custom domain.
+Expect a brief outage between deleting the record and the deploy attaching the Worker.
+
 ## Next steps (in order)
 1. **Decide on the residual public exposure.** While the repo was public, the real name
    and personal email were visible in LICENSE and in all five commit author fields.
@@ -87,10 +112,9 @@ files never enter git, public/, the sitemap, or the search index.
 Verified from outside: an unauthenticated GET to both `/` and `/test.txt` returns
 302 to linuxgroot-pages.cloudflareaccess.com with `www-authenticate: Cloudflare-Access`.
 
-Still to confirm in the dashboard (cannot be read via the MCP tools):
-- R2 > linuxgroot-p > Settings > **Public Development URL must show Disabled**. If it is
-  enabled, the bucket is reachable at its pub-*.r2.dev address and **Access is bypassed
-  entirely**. This is the single most important check on this setup.
-- Bucket root listing is not supported, so link objects directly.
+Public Development URL confirmed **Disabled** by the owner on 2026-08-28, so the
+pub-*.r2.dev bypass path is closed. Re-check this after any bucket settings change: it
+is the one way to expose the bucket without touching Access.
+Bucket root listing is not supported, so link objects directly.
 
 Upload with: `wrangler r2 object put linuxgroot-p/<key> --file <path> --remote`

@@ -78,7 +78,7 @@ free. Verified 2026-08-28.
 | --- | --- | --- | --- |
 | Workers Static Assets | Workers Free | Requests to static assets are free and unlimited. The 100k/day cap applies to Worker *invocations*, and this Worker has no `main`, so it has none. Limits that do bite: 20,000 asset files per version, 25 MiB per file. | Site is far under both |
 | R2 | Free tier | 10 GB-month, 1M Class A, 10M Class B ops. Egress always free. | Bucket `linuxgroot-p`, near-empty |
-| Zero Trust Access | Free | Seat count not verified from docs in this session — confirm on the Zero Trust plans page before adding users | 1 self-hosted app, 1 user |
+| Zero Trust Access | Free | 50 seats (confirmed by owner 2026-08-28) | 1 self-hosted app, 1 user |
 | DNS, DNSSEC, SSL, HSTS, Always Use HTTPS | Free | n/a | Enabled |
 | Bot Fight Mode | Free | n/a | Enabled |
 | AI bot blocking / AI Crawl Control | Free | n/a | Enabled |
