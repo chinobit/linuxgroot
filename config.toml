@@ -62,7 +62,14 @@ favicon = "/favicon.ico"
 
 theme_switcher = true
 default_theme = ""  # follow OS preference
-skin = "teal"
+
+# --- Documentation-framework look (decision 2026-08-28) ---
+# monochrome: neutral, high-contrast, reads like a reference manual rather than a
+# personal blog. Sans everywhere and ISO dates for the same reason. All reversible.
+skin = "monochrome"
+override_serif_with_sans = true
+long_date_format = "%Y-%m-%d"
+short_date_format = "%Y-%m-%d"
 
 menu = [
     { name = "blog", url = "blog", trailing_slash = true },

@@ -34,6 +34,10 @@ jobs:
       - name: Build site (drafts excluded)
         run: zola build
 
+      # Gate on the artifact, not the config: every security bug so far built green.
+      - name: Verify build invariants (CSP, headers, identity)
+        run: ./scripts/verify-build.sh
+
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:

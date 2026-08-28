@@ -17,9 +17,11 @@ site was never finished and is being fully replaced.
   old geolocation placeholder in the same slot). Config in wrangler.jsonc:
   assets-only (no `main`), directory ./public, custom_domain route linuxgroot.net.
 - Private files: R2 bucket `linuxgroot-p` (EEUR, Standard) on custom domain
-  files.linuxgroot.net, gated by a Cloudflare Access self-hosted application. This is
-  deliberately OUTSIDE the Zola build: private content never enters git, public/, the
-  sitemap, or search_index.en.js. Do not add a `content/private/` section instead —
+  files.linuxgroot.net, gated by a Cloudflare Access self-hosted application.
+  Upload: `wrangler r2 object put linuxgroot-p/<key> --file <path> --remote`.
+  No root listing — link objects directly. This is deliberately OUTSIDE the Zola
+  build: private content never enters git, public/, the sitemap, or
+  search_index.en.js. Do not add a `content/private/` section instead —
   build_search_index would publish its text at /search_index.en.js unauthenticated.
   The bucket's r2.dev Public Development URL must stay DISABLED; it bypasses Access.
 - CI/CD: .github/workflows/deploy.yml — push to main -> checkout with submodules ->
@@ -102,6 +104,13 @@ free. Verified 2026-08-28.
 NOT enabled and NOT free — do not turn these on without a plan change:
 WAF Managed Rules (Pro+), Super Bot Fight Mode (Pro+), Bot Management (Enterprise),
 Argo Smart Routing, Workers Paid ($5/mo), R2 Infrequent Access (no free tier).
+
+## Pending (dashboard-only, as of 2026-08-28)
+- HSTS: turn `preload` off (live header still carries it; decision above).
+- Web Analytics: add linuxgroot.net (automatic setup). CSP already permits the beacon;
+  afterwards `curl -s https://linuxgroot.net/ | grep -c beacon.min.js` should be 1.
+- From 2026-09-15: Configure AI bot policies per the constraint above.
+- Optional: www.linuxgroot.net has no DNS record (leave dead or redirect to apex).
 
 ## Conventions
 - Content in content/blog/, tags taxonomy only. Feed: atom.xml.
