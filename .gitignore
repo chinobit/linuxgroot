@@ -3,3 +3,4 @@ public
 *.css.map
 *.sass.map
 *.scss.map
+.mermaid-config.json

@@ -1,0 +1,9 @@
+flowchart TD
+    Q["Session question"] --> S{"Embedding search<br/>over notes"}
+    S -->|"top 3 matches"| R["Read only the<br/>named sections"]
+    S -.->|"no match"| W["Write a new note"]
+    R --> C["Agent context"]
+    C --> D["Decision or change"]
+    D --> W
+    W --> V[("Markdown in git")]
+    V --> S

@@ -73,8 +73,9 @@ short_date_format = "%Y-%m-%d"
 
 menu = [
     { name = "blog", url = "blog", trailing_slash = true },
+    { name = "toolbox", url = "toolbox", trailing_slash = true },
+    { name = "about", url = "about", trailing_slash = true },
     { name = "archive", url = "archive", trailing_slash = true },
-    { name = "tags", url = "tags", trailing_slash = true },
 ]
 
 # --- Privacy hardening ---
