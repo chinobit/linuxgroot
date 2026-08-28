@@ -11,7 +11,14 @@
     "name": "linuxgroot",
     "compatibility_date": "2026-08-01",
     "assets": {
-        "directory": "./public"
+        "directory": "./public",
+        // Zola builds public/404.html, but Workers Static Assets defaults
+        // not_found_handling to "none", which answers an unknown path with a bare
+        // empty 404 and never reaches the styled page. Verified against the live site
+        // before this line existed: the response body was zero bytes.
+        // Not "single-page-application": that would answer every unknown path with
+        // 200, which is wrong for a static site and bad for search engines.
+        "not_found_handling": "404-page"
     },
     "routes": [
         { "pattern": "linuxgroot.net", "custom_domain": true }
