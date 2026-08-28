@@ -9,7 +9,7 @@
 
 base_url = "https://linuxgroot.net"
 title = "LinuxGroot"
-description = "Notes on Linux, HPC, and infrastructure automation"
+description = "Linux, HPC, and AI infrastructure — practical notes for engineers and researchers who run GPU workloads"
 default_language = "en"
 theme = "tabi"
 
