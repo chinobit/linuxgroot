@@ -36,28 +36,39 @@ LinuxGroot <31506370+chinobit@users.noreply.github.com>, and LICENSE, README and
 site.webmanifest carry the handle only. The standing rule is in CLAUDE.md: nothing
 identity-bearing enters this repo, ever. Private files live in the R2 bucket.
 
-## Next steps (in order)
-1. **Unblock the deploy.** Free the apex hostname (see the BLOCKER section above), then
-   re-run the workflow. Everything else in the pipeline is already proven green.
-2. After the first successful deploy, verify from outside:
-   - `curl -sI https://linuxgroot.net | grep -Ei 'x-frame|nosniff|referrer|permissions'`
-   - the old `access-control-allow-origin: *` header is gone
-   - `curl -s https://linuxgroot.net/ | grep -c 'beacon.min.js'` is 1 once Web Analytics
-     is enabled, and the browser console shows no CSP violation for it
-3. Cloudflare dashboard, per the decisions recorded in CLAUDE.md:
-   - SSL/TLS > Edge Certificates > HSTS: turn **preload off**, keep 6 months and
-     includeSubDomains.
-   - Security Settings > Configure AI bot policies (available from 2026-09-15):
-     Training = Block all pages, Agent = Block all pages, Search = Allow. Turn on the
-     managed robots.txt preference.
-   - Analytics & Logs > Web Analytics: add linuxgroot.net, automatic setup.
+## SITE IS LIVE (2026-08-28, run 33176779761)
+The apex was owned by the old Cloudflare Pages project serving the AdiDoks build; the
+owner deleted it, wrangler attached the custom domain, and the deploy went green end
+to end. Verified from outside:
+- https://linuxgroot.net serves the tabi site ("I am LinuxGroot"); AdiDoks gone.
+- All static/_headers headers live: X-Frame-Options DENY, nosniff, Referrer-Policy,
+  Permissions-Policy, COOP/CORP. The old `access-control-allow-origin: *` is gone.
+- Meta CSP live and identical to the built artifact, including the Web Analytics
+  beacon allowance. Blog post and atom.xml return 200; bogus paths return 404.
+- Repo is PUBLIC (owner's decision, accepting the dangling-SHA residual: pre-rewrite
+  commits with the real name remain fetchable by SHA on GitHub).
+
+Loose end: www.linuxgroot.net has no DNS record and does not resolve. Either leave it
+dead deliberately or add an apex redirect (DNS record + redirect rule, free). HSTS
+includeSubDomains will apply to it once it exists.
+
+## Next steps (dashboard only)
+1. SSL/TLS > Edge Certificates > HSTS: turn **preload off** (decision in CLAUDE.md);
+   the live header still carries `preload`.
+2. Analytics & Logs > Web Analytics: add linuxgroot.net, automatic setup. CSP already
+   permits the beacon; after enabling, `curl -s https://linuxgroot.net/ | grep -c
+   beacon.min.js` should be 1 and the console clean.
+3. From 2026-09-15, Security Settings > Configure AI bot policies: Training = Block,
+   Agent = Block, Search = Allow; enable managed robots.txt.
+4. Optional: decide on www (redirect or leave dead).
 
 ## Done, verified
-- Cloudflare API token authenticates and wrangler v4 uploads the Worker version.
+- Deploy pipeline green end to end; site, headers, CSP, feed, 404 verified live.
+- Cloudflare API token authenticates; wrangler v4 handles the assets-only config.
+- History rewritten to a single identity; repo public; git identity pinned repo-local.
 - HSTS live at max-age 15552000 with includeSubDomains.
-- Zero Trust: 50 free seats, one self-hosted Access application.
+- Zero Trust: 50 free seats, one self-hosted Access application gating files.linuxgroot.net.
 - R2 public development URL disabled.
-- CSP emitted from the built artifact matches the intended policy.
 
 ## Cloudflare platform findings (verified via Cloudflare MCP, 2026-08-28)
 - The Cloudflare MCP connector is already authenticated and working — nothing to enable.
