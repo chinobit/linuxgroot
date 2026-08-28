@@ -99,6 +99,7 @@ free. Verified 2026-08-28.
 | Bot Fight Mode | Free | n/a | Enabled |
 | AI bot blocking / AI Crawl Control | Free | n/a | Enabled |
 | Web Analytics | Free | Unsampled data retained 7 days, then aggregated to ~10% | Enabled |
+| MCP Worker (repo linuxgroot-mcp) | Workers Free | This one HAS a `main`: 100k invocations/day, 10 ms CPU each | mcp.linuxgroot.net, Access-gated |
 | GitHub Actions | Free (private repo) | 2,000 min/month. Build is ~40 s/run. Note: making the repo private started this meter; public repos are unmetered. | Negligible |
 
 NOT enabled and NOT free — do not turn these on without a plan change:
