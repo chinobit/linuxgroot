@@ -113,13 +113,23 @@ Two, and every post declares which one it is for before a line is written.
   not be asked to acquire, an understanding of the underlying infrastructure. What
   they need is guidance and tips from the person who administers it.
 
-An admin-facing post should still earn its keep for the researcher affected by the
-topic. Give them a short section of their own: the symptom they would actually
-notice, what they can check without privileges, what to report and to whom, and what
-not to conclude about their own code. Their prompt should be theirs, phrased in their
-terms, and may reasonably ask the agent to draft the message to the administrator.
-That section is added value or it is cut; never a summary of the admin material in
-smaller words, and never condescending. The researcher is an expert, just not in this.
+Decide the audience before writing, and say which it is in the commit message. Some
+posts serve one audience, some serve both. The test is whether the second audience has
+a real stake in the topic: would they notice the symptom, or make a decision about it?
+
+- **Both.** An admin topic the researcher feels the effects of gets a short section of
+  its own, near the end: the symptom they would actually notice, what they can check
+  without privileges, what to report and to whom, and what not to conclude about their
+  own work. Their prompt is phrased in their terms and may reasonably ask the agent to
+  draft the message to the administrator.
+- **One.** Plenty of topics have no stake for the other side, and a post about
+  scheduler policy design or a site's build pipeline should not have a researcher
+  section bolted onto it. A researcher-facing post usually needs no admin section
+  either: its second audience is the administrator who forwards the link, and that
+  costs nothing to serve.
+
+Never summarise the admin material in smaller words and call it a section for
+researchers, and never write down to them. They are experts, just not in this.
 
 ## Voice - LinuxGroot
 One author voice across the site. It is neither a how-to site nor a deep-dive site.
