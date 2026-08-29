@@ -12,12 +12,26 @@
      * `.full-width` children can break back out; that inset is removed below and
      * the container narrowed instead, which keeps the breakout working while
      * pulling the reading measure from ~95 characters per line to ~70. */
-    --max-layout-width: 600px;
+    /* In rem, not px, so it scales with the root size set below. ~70 characters
+     * per line at any of them. A fixed pixel column is a ribbon on a large
+     * monitor: correct measure, wrong presence. */
+    --max-layout-width: 38rem;
 
     /* A single restrained accent. The monochrome skin ships grey-on-white and
      * carries hierarchy by size alone; one green does the work of an identity
      * without turning into decoration. Contrast checked against both grounds. */
     --primary-color: #2c6e49;
+}
+
+/* Scale the whole page on large displays rather than widening the measure.
+ * Text and column grow together, so the line stays ~70 characters while the
+ * page stops looking lost in the middle of a 1900px window. */
+@media (min-width: 1500px) {
+    :root { font-size: 17.5px; }
+}
+
+@media (min-width: 1900px) {
+    :root { font-size: 19px; }
 }
 
 [data-theme='dark'] {
