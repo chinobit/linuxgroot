@@ -144,17 +144,24 @@ faster than the same job on one, and scaling to eight makes it worse. That patte
 frequently blamed on the researcher's own code, sometimes for months, and it is
 equally consistent with the job never having touched the fast network at all.
 
-You can check it yourself, without any special access, in about a minute. Add one
-variable to your job so its communication library explains itself, and then read one
-line out of the log afterwards:
+If your job is multi-GPU deep learning, which is to say it uses NCCL underneath
+PyTorch, TensorFlow or JAX, you can check it yourself in about a minute and without
+any special access. Add one variable so the communication library explains itself,
+then read one line back out afterwards:
 
 ```bash
 # in your job script, before your program runs
 export NCCL_DEBUG=INFO
 
-# after the job finishes
-grep -m1 -E 'NET/(IB|Socket)' slurm-<jobid>.out
+# after it finishes: find where your output went, then look for the transport
+scontrol show job <jobid> | grep -E 'StdOut|StdErr'
+grep -m1 -E 'NET/(IB|Socket)' <the file that names>
 ```
+
+The second step looks roundabout, and it is deliberate: output paths are a per-site
+and per-submission decision, so asking the scheduler where your output went is the
+version of this that works everywhere rather than only on the cluster it was written
+on. Do it soon after the job ends, while the scheduler still remembers it.
 
 `NET/IB` means your gradients went over the high-speed fabric. `NET/Socket` means they
 went over ordinary networking, and on a cluster that has a fast fabric, that is a

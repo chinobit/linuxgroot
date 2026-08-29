@@ -144,6 +144,25 @@ Added value scales, and the smallest forms are often the best:
 Never summarise the admin material in smaller words and call it a section for
 researchers, and never write down to them. They are experts, just not in this.
 
+## Published commands must work on the owner's own systems
+The site's readers include the users of the clusters the author administers, so a
+command published here is a command those users will run, and being wrong costs the
+author a support ticket about his own advice.
+
+- **Validated before publication.** A command goes in only once it has been run, or
+  the owner has confirmed it, on the systems it is aimed at. Where that has not
+  happened, say so in the handover rather than shipping it quietly.
+- **Site-independent by construction.** Never assume defaults that are per-site or
+  per-submission choices: output file naming, partition and QOS names, module names,
+  filesystem layout, scheduler output paths. Ask the system for the value rather than
+  hardcoding the default (for example, get the output path from the scheduler instead
+  of assuming `slurm-<jobid>.out`).
+- **State the precondition.** If a command only applies to a subset of workloads,
+  name that subset in the sentence before it, rather than letting a reader discover
+  it does not apply to them by getting no output.
+- Read-only wherever possible. Never publish something whose failure mode is a
+  changed system, and never anything requiring privileges the reader will not have.
+
 ## Voice - LinuxGroot
 One author voice across the site. It is neither a how-to site nor a deep-dive site.
 - Professional but humble. Slightly humorous, dry rather than jokey. A line earns its
