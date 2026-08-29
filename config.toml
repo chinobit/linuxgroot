@@ -106,7 +106,8 @@ show_date = true
 # `updated = YYYY-MM-DD`, and falls back to the original date alone when it does not.
 # On a reference-style site the revision date is the credibility signal: it tells a
 # reader whether the commands below were checked recently or in 2026.
-post_listing_date = "both"
+post_listing_date = "date"
+stylesheets = ["custom.css"]  # static/custom.css - bare key, must stay above [extra.*]
 toc = true                  # ToC on posts; disable per-page with toc = false
 katex = false               # enable per-page in front matter when needed
 mermaid = false             # enable per-page; loads ~2.5 MB JS only where used

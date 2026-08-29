@@ -1,0 +1,150 @@
+/* linuxgroot.net - site styling on top of tabi's monochrome skin.
+ *
+ * Loaded via extra.stylesheets, so it is served from this origin and needs no
+ * relaxation of style-src 'self'. It only sets values the theme already exposes
+ * as custom properties, plus a handful of layout corrections, so a theme bump
+ * cannot silently drop it: the worst case is a rule that no longer matches.
+ */
+
+:root {
+    /* One column for header, listing and article, so everything shares a left
+     * edge. The theme insets `article` by 12rem inside this container so that
+     * `.full-width` children can break back out; that inset is removed below and
+     * the container narrowed instead, which keeps the breakout working while
+     * pulling the reading measure from ~95 characters per line to ~70. */
+    --max-layout-width: 600px;
+
+    /* A single restrained accent. The monochrome skin ships grey-on-white and
+     * carries hierarchy by size alone; one green does the work of an identity
+     * without turning into decoration. Contrast checked against both grounds. */
+    --primary-color: #2c6e49;
+}
+
+[data-theme='dark'] {
+    --primary-color: #86c9a4;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+        --primary-color: #86c9a4;
+    }
+}
+
+/* Reading measure and rhythm. The cap is belt and braces with the layout width
+ * above: on a wide viewport the container wins, on a narrow one the ch unit
+ * does, and neither can produce a 100-character line. */
+/* Drop the theme's 12rem inset: the container above is now the measure, and
+ * `.full-width` children still break out by 6rem either side, which is how the
+ * diagrams get to be wider than the prose. */
+article {
+    max-width: 100%;
+}
+
+.e-content.body {
+    line-height: 1.65;
+}
+
+/* The post list gave a ninth of the width to a date and left it mostly empty.
+ * The mobile treatment, meta inline above the title, reads better, so use it at
+ * every width instead of only below the breakpoint. The theme pads meta and
+ * content 2.5rem each, which stacks into a 5rem hole once they are in one
+ * column, so both are zeroed and the spacing is put on the row instead. */
+.bloglist-container {
+    display: block;
+    padding-block: 2.25rem;
+    border-bottom: 1px solid var(--divider-color);
+}
+
+.bloglist-container:last-of-type {
+    border-bottom: 0;
+}
+
+/* The theme puts its own rule under the meta row, which in one column lands
+ * between a post's date and its title rather than between posts. */
+.bloglist-meta.bottom-divider,
+.bloglist-content.bottom-divider {
+    border-bottom: 0;
+}
+
+.bloglist-meta {
+    display: block;
+    min-width: 0;
+    padding-block: 0;
+    margin-bottom: 0.35rem;
+}
+
+.bloglist-meta ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+}
+
+.bloglist-content {
+    display: block;
+    padding: 0;
+}
+
+.bloglist-content .bloglist-title {
+    margin-block: 0 0.4rem;
+}
+
+.bloglist-tags {
+    margin-bottom: 0.6rem;
+}
+
+.bloglist-title a:hover,
+.bloglist-tags a:hover {
+    color: var(--primary-color);
+}
+
+/* The title above is already the link. */
+a.readmore {
+    display: none;
+}
+
+/* A table of contents is a signpost, not a chapter. It was setting eight grey
+ * bullets and a heading between the reader and the first sentence. */
+.toc-container {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    border-left: 2px solid var(--divider-color);
+    padding-left: 1rem;
+    margin-block: 2rem;
+}
+
+.toc-container ul {
+    margin: 0;
+    padding-left: 1rem;
+}
+
+.toc-container li {
+    margin: 0.15rem 0;
+}
+
+/* The accent has to appear somewhere to be an accent. The skin only wires
+ * --primary-color into tables, code and the footer, so links in prose and the
+ * table-of-contents rule are given it deliberately. Links keep an underline:
+ * colour alone is not an accessible affordance. */
+.e-content.body a {
+    color: var(--primary-color);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+}
+
+.toc-container {
+    border-left-color: var(--primary-color);
+}
+
+/* Diagrams are rendered wide on purpose and arrive as a bare <img>, so they get
+ * the same breakout the theme reserves for .full-width children. Prose stays at
+ * the reading measure while figures use the fuller width, which is the usual
+ * editorial arrangement. Guarded by a min-width so narrow viewports, where
+ * there is no room to break out of, keep the plain 100% image. */
+@media (min-width: 1000px) {
+    article img.invertible-image {
+        margin-inline: -6rem;
+        max-width: calc(100% + 12rem);
+    }
+}

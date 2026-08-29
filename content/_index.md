@@ -1,5 +1,5 @@
 +++
-title = "LinuxGroot"
+title = "Latest"
 sort_by = "date"
 
 [extra]
