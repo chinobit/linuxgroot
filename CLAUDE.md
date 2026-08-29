@@ -146,22 +146,28 @@ researchers, and never write down to them. They are experts, just not in this.
 
 ## Published commands must work on the owner's own systems
 The site's readers include the users of the clusters the author administers, so a
-command published here is a command those users will run, and being wrong costs the
-author a support ticket about his own advice.
+command published here is a command those users will run.
 
-- **Validated before publication.** A command goes in only once it has been run, or
-  the owner has confirmed it, on the systems it is aimed at. Where that has not
-  happened, say so in the handover rather than shipping it quietly.
-- **Site-independent by construction.** Never assume defaults that are per-site or
-  per-submission choices: output file naming, partition and QOS names, module names,
-  filesystem layout, scheduler output paths. Ask the system for the value rather than
-  hardcoding the default (for example, get the output path from the scheduler instead
-  of assuming `slurm-<jobid>.out`).
-- **State the precondition.** If a command only applies to a subset of workloads,
-  name that subset in the sentence before it, rather than letting a reader discover
-  it does not apply to them by getting no output.
-- Read-only wherever possible. Never publish something whose failure mode is a
-  changed system, and never anything requiring privileges the reader will not have.
+The basis for that is **ingested context plus best practice, never reconnaissance**.
+Write from what the vault and the repo already record. Where they are silent, assume
+the systems are configured to best practice and write to that assumption. Do not probe
+the target systems, and do not hand the work back by asking the administrator to go
+and check something on his own cluster: that is a request for reconnaissance wearing a
+question mark, and answering it is his job to have already done, not his job to do for
+a blog post.
+
+- **Best practice is the default assumption**, and content that has greatly diverged
+  from it does not get published. That filter applies before the command is written,
+  not after (see the subject-scrutiny rule in the project note).
+- **Site-independent by construction.** Prefer a form that holds under any reasonable
+  configuration over one that depends on a site-specific default: ask the scheduler
+  where the output went rather than assuming `slurm-<jobid>.out`. This is not
+  defensiveness, it is what makes the command portable to the reader's site too.
+- **State the precondition.** If a command only applies to a subset of workloads, name
+  that subset in the sentence before it, rather than letting a reader discover it does
+  not apply by getting no output.
+- Read-only wherever possible. Never publish something whose failure mode is a changed
+  system, and never anything requiring privileges the reader will not have.
 
 ## Voice - LinuxGroot
 One author voice across the site. It is neither a how-to site nor a deep-dive site.
