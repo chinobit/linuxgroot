@@ -203,3 +203,11 @@ a.readmore {
         max-width: calc(100% + 3rem);
     }
 }
+
+/* Wordmark. The site name is the logo, so it is set as one: slightly heavier
+ * than the navigation beside it and tracked in a touch, so it reads as a mark
+ * rather than as the first link in the menu. */
+.nav-title {
+    font-weight: 600;
+    letter-spacing: -0.022em;
+}

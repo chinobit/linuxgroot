@@ -67,13 +67,16 @@ CARD_HTML = """<!doctype html>
     font-size: 26px; color: #6b6b73;
   }}
   .site {{ color: #16161a; font-weight: 700; }}
+  /* The root-prompt mark, inline so the card stays a single self-contained
+     render with no asset to fetch. */
+  .mark {{ width: 46px; height: 46px; flex: 0 0 auto; color: #2c6e49; }}
 </style>
 <div class="kicker">{kicker}</div>
 <div>
   <h1>{title}</h1>
   {description}
 </div>
-<footer><span class="site">{site}</span><span>{tagline}</span></footer>
+<footer><svg class="mark" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M13 5 L10 27 M23 5 L20 27 M5 12 L27 12 M4 20 L26 20" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/></svg><span class="site">{site}</span><span>{tagline}</span></footer>
 """
 
 
