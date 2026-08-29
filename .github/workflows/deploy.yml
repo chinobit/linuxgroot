@@ -28,8 +28,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (with theme submodule)
-        # Pinned by commit SHA (tag: v5) - tags are mutable, SHAs are not.
-        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        # Pinned by commit SHA (tag: v7.0.1) - tags are mutable, SHAs are not.
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           submodules: true
 
@@ -57,13 +57,17 @@ jobs:
           LEAK_PATTERNS_FILE="$RUNNER_TEMP/leak-patterns" ./scripts/verify-build.sh
 
       - name: Deploy to Cloudflare Workers
-        # Pinned by commit SHA (tag: v3)
-        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd
+        # Pinned by commit SHA (tag: v4.0.0). v3.15.0 declared `using: node20`, which
+        # the runner now force-upgrades to node24 with a deprecation annotation; v4.0.0
+        # declares node24 natively. Its one breaking change is the default wrangler
+        # version, which does not reach us because we pin that explicitly below.
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0
         with:
-          # wrangler-action@v3 defaults to wrangler 3.90.0, which predates assets-only
-          # Workers and fails with "Missing entry-point" on a config with no `main`.
-          # Assets-only deploys require wrangler v4+. Pinned like every other tool here.
-          wranglerVersion: '4.127.0'
+          # v4 defaults to wrangler `latest`, and "latest" is not a version: an upstream
+          # release would change what this workflow deploys with, without a commit here.
+          # Pinned like every other tool in this repo. Must stay v4+ regardless, since
+          # assets-only Workers (no `main` in wrangler.jsonc) fail on wrangler 3.
+          wranglerVersion: '4.127.1'
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy
