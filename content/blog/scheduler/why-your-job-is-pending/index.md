@@ -1,6 +1,7 @@
 +++
 title = "Why your job is still pending"
 date = 2026-08-28
+updated = 2026-08-29
 weight = 1
 description = "Fairshare is not a queue and priority is not a position. What Slurm computes while your job waits, and the three commands that tell you which part of it you are losing to."
 insert_anchor_links = "left"
@@ -180,3 +181,28 @@ sshare -U -u $USER                                           # how deep is the h
 And one habit: declare a walltime you would bet on, not one you cannot lose with.
 Accurate walltimes are the closest thing to free priority that a scheduler
 offers, and almost nobody claims it.
+
+Those three commands produce three walls of text. Turning them into an answer is
+tedious and highly site-specific, which makes it worth delegating:
+
+**Prompt for your agent:**
+
+```text
+My job has been pending and I want to know which part of the scheduler's decision
+I am losing to, without guessing at my site's policy.
+
+Here is my scheduler's own output:
+<paste the output of the three commands above>
+<paste the resource request from your job script>
+
+Working only from those outputs, tell me which priority component is dominating,
+and whether the job is waiting on priority, on available resources, or on a
+limit. Explain each factor using my site's configured weights as shown in the
+output, not the defaults from the documentation, because the two are rarely the
+same.
+
+Then separate your answer into two lists: what is a policy decision my
+administrators made, and what is a property of the scheduler itself. Those need
+very different conversations. If part of the output has no explanation you can
+support from what I gave you, say so rather than filling the gap.
+```

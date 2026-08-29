@@ -1,6 +1,7 @@
 +++
 title = "Hivemind: notes an agent can actually use"
 date = 2026-08-28
+updated = 2026-08-29
 description = "A file-based knowledge base designed for LLM agents rather than adapted to them. Plain Markdown, retrieval instead of ingestion, and rituals implemented as scripts rather than requests."
 insert_anchor_links = "left"
 
@@ -65,6 +66,30 @@ the frontmatter that says what the note is *for*, and a title that matches how
 the question would be asked. Long transcripts and meeting-minute style notes are
 useless here, and the system's cost structure makes that obvious rather than a
 matter of taste.
+
+Whether an existing pile of notes has that property is not something you can tell by
+looking at it, and it is a good first job to hand to the agent that will be reading
+them:
+
+**Prompt for your agent:**
+
+```text
+I want to know whether my existing notes are usable by an agent, rather than
+merely readable by me.
+
+Here is the structure: <paste a listing of your notes tree>
+Here are three representative notes: <paste them>
+
+Assess this for retrieval rather than for reading. Could a specific question find
+the one relevant note without loading the whole tree? Tell me which notes are too
+long, which cover more than one idea and should be split, and which have titles or
+opening lines that would not match the way the question actually gets asked.
+
+Then flag anything that does not belong in a knowledge base at all: credentials,
+tokens, private keys, or anything that would be a problem if the entire tree were
+read by a tool I had not chosen. Treat that as the first pass rather than the
+last, and tell me plainly if you are unsure whether something qualifies.
+```
 
 ## Rituals as scripts, not requests
 

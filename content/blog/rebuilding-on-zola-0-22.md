@@ -1,6 +1,7 @@
 +++
 title = "Three ways a static site build lies to you"
 date = 2026-08-28
+updated = 2026-08-29
 description = "Migrating to Zola 0.22.1 on a theme built for 0.21: one loud failure, and two that exit zero while quietly shipping the wrong site."
 
 [taxonomies]
@@ -93,4 +94,29 @@ grep -o 'Content-Security-Policy[^>]*' public/index.html
 ```
 
 Which is the same rule as the previous section, and honestly the same rule as most
-sections. Exit code zero is not evidence. The artifact is evidence.
+sections. That grep is the beginning of a check, not the whole of one, and the whole
+of one is specific to whatever you are building:
+
+**Prompt for your agent:**
+
+```text
+I want to verify my static site's built output rather than trusting its config,
+because a build that exits zero has told me nothing about what it produced.
+
+My generator is <generator and version>, my theme is <theme and version>, and my
+build directory is <path>.
+
+Write me a check script that runs against the built HTML rather than the source,
+and asserts: that every page carries the Content-Security-Policy I intended, that
+no page has quietly acquired 'unsafe-inline' or a wildcard host, that no page
+carries inline style attributes, and that nothing loads a subresource from a
+domain I did not approve.
+
+For each check, tell me the specific failure it exists to catch, and cite the
+generator or theme documentation for the setting involved. Then prove each check
+can fail: give me a way to plant a violation and confirm the check reports it. A
+check that matches nothing passes silently, which is the same class of problem as
+the ones above.
+```
+
+Exit code zero is not evidence. The artifact is evidence.

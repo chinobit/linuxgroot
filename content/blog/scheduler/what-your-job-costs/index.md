@@ -1,6 +1,7 @@
 +++
 title = "What your job actually costs"
 date = 2026-08-28
+updated = 2026-08-29
 weight = 2
 description = "Fairshare charges you for what you reserved, not what you used. Billing weights, why an idle GPU costs exactly as much as a busy one, and the one over-request that is genuinely free."
 insert_anchor_links = "left"
@@ -153,3 +154,27 @@ seff <jobid>                                                # what you needed
 
 Run the third one on your last five jobs. Most people discover their next request
 should be about half the size, which is also the request that starts sooner.
+
+Doing that arithmetic across five jobs by hand is exactly the sort of thing nobody
+gets around to, so hand it over:
+
+**Prompt for your agent:**
+
+```text
+Help me work out what my recent jobs actually cost, and what I should be
+requesting instead.
+
+Here is what my cluster and my jobs report:
+<paste your partition's billing configuration>
+<paste the accounting output for your last five jobs>
+
+For each job, tell me what I was charged, what I actually used, and what the
+request should have been. Show the arithmetic against my site's own billing
+weights rather than assuming a standard exchange rate, since every site sets its
+own and the difference is the whole point.
+
+Then rank my habits by what they cost me: over-requesting memory, over-requesting
+GPUs, or holding an allocation idle. If my configuration is missing something you
+need to answer properly, tell me what is missing instead of substituting a
+default value.
+```
