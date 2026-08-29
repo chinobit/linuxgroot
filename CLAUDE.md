@@ -149,6 +149,12 @@ The site's readers include the users of the clusters the author administers, so 
 command published here is a command those users will run.
 
 The basis for that is **ingested context plus best practice, never reconnaissance**.
+That is the current state and not the ceiling: the owner reserves the right to supply
+real facts about his own systems (partition and QOS names, limits, configuration) to
+raise the factual authenticity and the added value of a post. Until he does, write to
+best practice and shape examples so a real name or limit can be dropped in later
+without restructuring the piece. Never invent a specific fact about his systems to
+fill that gap, and never reach for one to make a post feel more concrete.
 Write from what the vault and the repo already record. Where they are silent, assume
 the systems are configured to best practice and write to that assumption. Do not probe
 the target systems, and do not hand the work back by asking the administrator to go
@@ -163,6 +169,12 @@ a blog post.
   configuration over one that depends on a site-specific default: ask the scheduler
   where the output went rather than assuming `slurm-<jobid>.out`. This is not
   defensiveness, it is what makes the command portable to the reader's site too.
+- **Never publish a parameter set to its own default.** Telling a reader to set
+  something to the value it already has is noise that reads like insight, and it
+  spreads: the next person copies the block and now carries a setting they cannot
+  explain. If a default is doing the right thing, either say that it already covers
+  the case or say nothing. A setting is worth printing only when it changes behaviour
+  (`NCCL_DEBUG=INFO` turns diagnostics on; `NCCL_IB_QPS_PER_CONNECTION=1` is furniture).
 - **State the precondition.** If a command only applies to a subset of workloads, name
   that subset in the sentence before it, rather than letting a reader discover it does
   not apply by getting no output.
