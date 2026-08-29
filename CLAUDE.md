@@ -113,9 +113,22 @@ Two, and every post declares which one it is for before a line is written.
   not be asked to acquire, an understanding of the underlying infrastructure. What
   they need is guidance and tips from the person who administers it.
 
-Decide the audience before writing, and say which it is in the commit message. Some
-posts serve one audience, some serve both. The test is whether the second audience has
-a real stake in the topic: would they notice the symptom, or make a decision about it?
+This is a redirection for judgement, not a gate. No post is rejected for serving one
+audience, and posts on adjacent subjects that serve neither are fine. What it asks is
+that both audiences are *considered* while writing, and served wherever there is
+genuine value to add. The test is whether the second audience has a real stake: would
+they notice the symptom, or decide something about it? Note the audience in the commit
+message so the choice stays visible.
+
+Added value scales, and the smallest forms are often the best:
+- **One command.** A single line that makes a reader's next job cheaper, faster or
+  easier to diagnose is worth more than a section of explanation. Give the actual
+  line, not a description of it. This is the one place the "do not spell out flags"
+  rule yields: for a researcher, the copy-paste line *is* the value.
+- **A prompt.** The agent prompts are not only for peers. Where the topic touches the
+  people who submit jobs on the systems being described, one prompt should be theirs,
+  phrased in their terms.
+- **A section.** Only where the topic genuinely affects them enough to need one.
 
 - **Both.** An admin topic the researcher feels the effects of gets a short section of
   its own, near the end: the symptom they would actually notice, what they can check

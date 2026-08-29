@@ -144,10 +144,21 @@ faster than the same job on one, and scaling to eight makes it worse. That patte
 frequently blamed on the researcher's own code, sometimes for months, and it is
 equally consistent with the job never having touched the fast network at all.
 
-You can check that yourself without any special access. Ask your job to be verbose
-about its networking, run something small, and look at which transport it chose. If
-it picked ordinary TCP on a cluster that has a high-speed fabric, that is a finding,
-and it is not a finding about your code.
+You can check it yourself, without any special access, in about a minute. Add one
+variable to your job so its communication library explains itself, and then read one
+line out of the log afterwards:
+
+```bash
+# in your job script, before your program runs
+export NCCL_DEBUG=INFO
+
+# after the job finishes
+grep -m1 -E 'NET/(IB|Socket)' slurm-<jobid>.out
+```
+
+`NET/IB` means your gradients went over the high-speed fabric. `NET/Socket` means they
+went over ordinary networking, and on a cluster that has a fast fabric, that is a
+finding. It is also not a finding about your code.
 
 What to do with it matters more than the diagnosis. Send your administrator the job
 identifier, the node list, the time it ran, and the specific line from the log that
