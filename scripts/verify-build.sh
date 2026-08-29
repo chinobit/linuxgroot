@@ -136,7 +136,10 @@ fi
 # the site description in config.toml, reproduced into the meta and OG tags of all 25
 # pages. Scoped to HTML: public/js/{katex,mermaid}.min.js are vendored theme assets
 # whose contents are not ours to restyle.
-emdash=$(grep -rl '—' $pages 2>/dev/null || true)
+# Built from its codepoint rather than written literally, so this script does not
+# itself contain the character it bans and a source-wide scan needs no exception.
+emdash_char=$(printf '\u2014')
+emdash=$(grep -rlF "$emdash_char" $pages 2>/dev/null || true)
 if [ -n "$emdash" ]; then
   printf '%s\n' "$emdash" >&2
   fail "em dash (U+2014) in published prose - house style is a spaced hyphen; check content/ and the description in config.toml"
