@@ -21,6 +21,15 @@ environment variable. The contract, in precedence order:
 
 ## Stack & architecture
 - Zola v0.22.1 (static site generator), pinned everywhere - CI binary, local container.
+  DO NOT bump to 0.23.x. Evaluated 2026-08-29 and blocked on the theme, not on Zola:
+  0.23.0 removes shortcodes entirely and moves to Tera 2, and tabi v4.1.0 is built on
+  Tera 1 (15 macro definitions across 11 template files, 17 shipped shortcodes). Tested,
+  not assumed: `zola build` under v0.23.4 on this exact tree fails at the first template
+  it parses, `tabi/templates/404.html:3` ("Unknown tag" on `{% macro %}`), while v0.22.1
+  builds the same tree clean. Our own content also calls the `invertible_image`
+  shortcode three times. Revisit trigger: a tabi release declaring Zola 0.23 / Tera 2
+  support. As of 2026-08-29 tabi's last release is v4.1.0 (2025-06-14) and `main` shows
+  only dependency bumps, no migration work.
   Zola 0.22 is a breaking release: it replaced the syntect highlighter with giallo and
   moved the highlight keys into [markdown.highlighting]. tabi v4.1.0 still ships a
   0.21-era config.toml, so do not copy the theme's example config verbatim.
