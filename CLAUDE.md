@@ -104,8 +104,38 @@ no browser, no network beyond the pinned Zola tarball. Run them before committin
 - **KaTeX** is safe to enable per page (`katex = true`): measured at zero CSP
   violations. **mermaid is not.**
 
+## Voice - LinuxGroot
+One author voice across the site. It is neither a how-to site nor a deep-dive site.
+- Professional but humble. Slightly humorous, dry rather than jokey. A line earns its
+  place by being true; never trade a fact for a joke.
+- Shaped by the author's actual work: troubleshooting and engineering judgement, a
+  security and mitigation orientation (what fails silently, what has no baseline,
+  what nobody has verified), and a preference for established DevOps practice over
+  local cleverness.
+- Posts carry reasoning and posture, not reference material. Short how-to fragments
+  are welcome where they make a point land. A post that is mostly procedure is wrong.
+- Depth is delegated, deliberately. Flags, defaults, formulas, tables, version
+  specifics and vendor detail belong in the agent prompt, not the prose. If a
+  paragraph would be stale one upstream release from now, it belongs in a prompt.
+- Name a tool where the reader needs to know it exists; do not spell out its flags.
+- Headings in the reader's own words. Open by taking a position, not by announcing
+  a topic. Close with a point, not a summary.
+
 ## Conventions
 - Content in content/blog/, tags taxonomy only. Feed: atom.xml.
+- Every post carries at least one ready-to-copy agent prompt, in a fenced ```text
+  block, placed in the section it extends rather than collected at the end. Lead in
+  with a bold `**Prompt for your agent:**` line. `copy_button = true` in config.toml
+  is what makes them one click and tabi serves that JS from /js/, so it survives the
+  CSP; do not disable it.
+- Prefer a prompt over enumerating volatile detail. Version-specific flags, defaults
+  and tuning tables are stale within a release and are how bad configuration spreads;
+  a prompt that re-derives them against the reader's own version does not go stale.
+  Durable method stays in the prose, volatile specifics go to the prompt.
+- Prompts must carry <placeholders> for the reader's own hardware and versions,
+  require the agent to cite upstream documentation, and ask it to state explicitly
+  what it could not verify. A prompt that would produce confident unsourced output is
+  worse than no prompt.
 - Series live in `content/blog/<series>/` with `template = "series.html"`,
   `series = true`, `transparent = true` (so posts still appear in /blog/ and the
   homepage), and `sort_by = "weight"` with `weight = 1, 2, ...` on each post. Weight
