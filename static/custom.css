@@ -162,3 +162,44 @@ a.readmore {
         max-width: calc(100% + 12rem);
     }
 }
+
+/* Wide displays: use the space, do not stretch the paragraph.
+ *
+ * A wider column is the wrong fix, because a 110-character line is harder to
+ * read than a short one with margin beside it. So above 1400px the article
+ * becomes two columns: prose keeps its measure on the left, and the table of
+ * contents moves out of the reading flow into the right-hand space it was
+ * previously wasting, where it sticks while you scroll. The listing has no such
+ * constraint and simply takes the full width. */
+@media (min-width: 1400px) {
+    :root {
+        --max-layout-width: 58rem;
+    }
+
+    article.h-entry {
+        display: grid;
+        grid-template-columns: minmax(0, 38rem) 16rem;
+        column-gap: 4rem;
+        align-items: start;
+    }
+
+    article.h-entry > * {
+        grid-column: 1;
+    }
+
+    article.h-entry > .toc-container {
+        grid-column: 2;
+        grid-row: 1 / span 5;
+        position: sticky;
+        top: 2rem;
+        margin-block: 0;
+        max-height: 82vh;
+        overflow-y: auto;
+    }
+
+    /* The left breakout only: the right-hand space now belongs to the contents. */
+    article img.invertible-image {
+        margin-inline: -3rem 0;
+        max-width: calc(100% + 3rem);
+    }
+}
