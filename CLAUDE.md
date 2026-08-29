@@ -104,6 +104,23 @@ no browser, no network beyond the pinned Zola tarball. Run them before committin
 - **KaTeX** is safe to enable per page (`katex = true`): measured at zero CSP
   violations. **mermaid is not.**
 
+## Audience
+Two, and every post declares which one it is for before a line is written.
+- **HPC Linux administrators.** Peers. Write to them as an equal: judgement,
+  trade-offs and posture, no explaining what a scheduler is.
+- **University cluster users: multidisciplinary researchers.** Domain experts in
+  their own field who use the cluster as an instrument. They do not need, and should
+  not be asked to acquire, an understanding of the underlying infrastructure. What
+  they need is guidance and tips from the person who administers it.
+
+An admin-facing post should still earn its keep for the researcher affected by the
+topic. Give them a short section of their own: the symptom they would actually
+notice, what they can check without privileges, what to report and to whom, and what
+not to conclude about their own code. Their prompt should be theirs, phrased in their
+terms, and may reasonably ask the agent to draft the message to the administrator.
+That section is added value or it is cut; never a summary of the admin material in
+smaller words, and never condescending. The researcher is an expert, just not in this.
+
 ## Voice - LinuxGroot
 One author voice across the site. It is neither a how-to site nor a deep-dive site.
 - Professional but humble. Slightly humorous, dry rather than jokey. A line earns its

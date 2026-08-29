@@ -1,7 +1,8 @@
 +++
 title = "Green lights are not bandwidth"
 date = 2026-08-29
-description = "Nobody accepts a server without counting the RAM, and almost everybody accepts an interconnect on the strength of some green lights. What an acceptance test for a GPU fabric is actually for, and a prompt to build yours."
+updated = 2026-08-29
+description = "Nobody accepts a server without counting the RAM, and almost everybody accepts an interconnect on the strength of some green lights. What an acceptance test for a GPU fabric is for, plus how to tell, as a researcher, whether your slow multi-node job is your code or the cluster."
 insert_anchor_links = "left"
 
 [taxonomies]
@@ -131,6 +132,58 @@ not do so because they are capable of it; the feature needs the plugin, the
 configuration and the entitlement to line up, and then it needs you to go and read
 the log to confirm a collective actually used it. Capability is a purchase.
 Behaviour is a measurement.
+
+## If you run jobs rather than clusters
+
+Everything above is written for whoever administers the machine. If you are a
+researcher whose multi-node job is disappointing, the useful part of it is much
+shorter, and none of it requires you to learn how the network works.
+
+The symptom worth recognising: your job spread across four nodes finishes barely
+faster than the same job on one, and scaling to eight makes it worse. That pattern is
+frequently blamed on the researcher's own code, sometimes for months, and it is
+equally consistent with the job never having touched the fast network at all.
+
+You can check that yourself without any special access. Ask your job to be verbose
+about its networking, run something small, and look at which transport it chose. If
+it picked ordinary TCP on a cluster that has a high-speed fabric, that is a finding,
+and it is not a finding about your code.
+
+What to do with it matters more than the diagnosis. Send your administrator the job
+identifier, the node list, the time it ran, and the specific line from the log that
+names the transport. That is a five-minute conversation. "The cluster feels slow" is
+a two-week one, because it contains no evidence anybody can act on.
+
+And the thing not to conclude: a slow multi-node run is not proof that your problem
+does not parallelise. It might not, and that is a real possibility worth taking
+seriously, but rule out the boring infrastructure explanation before you rewrite
+anything.
+
+**Prompt for your agent:**
+
+```text
+I ran a job across several nodes on my university's HPC cluster and it was
+barely faster than running on one node. I am a researcher, not a systems
+administrator, and I would like to know whether the problem is my code or the
+cluster before I start rewriting anything.
+
+Here is the log from my job, including its startup output:
+<paste the log>
+
+Here is how I submitted it:
+<paste your job script>
+
+Tell me, in plain terms: did the job use the cluster's high-speed network, or did
+it fall back to ordinary networking? Which parts of my result are explained by
+that, and which are more likely to be about how my code parallelises?
+
+If it looks like an infrastructure problem, draft a short, polite message I can
+send to my cluster administrators. Include the specific evidence they will need
+(job ID, nodes, timestamps, and the exact log lines) and keep it to a few
+sentences, because they are busy and a vague report goes to the back of the
+queue. If you are not sure, say which additional output I should collect rather
+than guessing.
+```
 
 ## Copied configuration is inherited debt
 
