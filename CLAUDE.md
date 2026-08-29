@@ -1,7 +1,7 @@
-# CLAUDE.md — project context for Claude Code
+# CLAUDE.md - project context for Claude Code
 
 ## Project
-Personal technical blog for linuxgroot.net. Complete rebuild — the old AdiDoks-based
+Personal technical blog for linuxgroot.net. Complete rebuild - the old AdiDoks-based
 site was never finished and is being fully replaced.
 
 ## Agent knowledge base (AGENT_KB)
@@ -15,30 +15,30 @@ environment variable. The contract, in precedence order:
 - **When it is unset, skip the KB entirely.** This file is sufficient on its own; no
   step here may depend on a KB being present.
 - **Only the variable name is committed, never a value.** The KB path is per-machine
-  and lives in `.claude/settings.local.json`, which is gitignored — it is an absolute
+  and lives in `.claude/settings.local.json`, which is gitignored - it is an absolute
   home path, and this repo is public. Do not commit it, and do not name a specific KB,
   path or host anywhere in this repo.
 
 ## Stack & architecture
-- Zola v0.22.1 (static site generator), pinned everywhere — CI binary, local container.
+- Zola v0.22.1 (static site generator), pinned everywhere - CI binary, local container.
   Zola 0.22 is a breaking release: it replaced the syntect highlighter with giallo and
   moved the highlight keys into [markdown.highlighting]. tabi v4.1.0 still ships a
   0.21-era config.toml, so do not copy the theme's example config verbatim.
 - Theme: tabi (welpo/tabi), git submodule at themes/tabi, pinned to v4.1.0 (23a1baf).
   Never track `main`; bump the pin deliberately.
-  tabi requires compile_sass = true — its skins, layout and syntax palette are all
+  tabi requires compile_sass = true - its skins, layout and syntax palette are all
   sass/main.scss. With it false the build still exits 0 and serves HTML with no CSS.
 - Hosting: Cloudflare Workers Static Assets. Worker name `linuxgroot` (replaces the
   old geolocation placeholder in the same slot). Config in wrangler.jsonc:
   assets-only (no `main`), directory ./public, custom_domain route linuxgroot.net.
 - Private files and operational/security configuration are documented in the
   owner's private notes, not in this public repo. Do not add them here.
-- CI/CD: .github/workflows/deploy.yml — push to main -> checkout with submodules ->
+- CI/CD: .github/workflows/deploy.yml - push to main -> checkout with submodules ->
   install Zola v0.22.1 -> `zola build` (never pass --drafts) -> wrangler-action deploy.
 - Secrets: CLOUDFLARE_API_TOKEN (scoped: Workers Scripts:Edit, this account only),
   CLOUDFLARE_ACCOUNT_ID. GitHub Actions secrets only, never committed.
 
-## Hard constraints — do not change without explicit approval
+## Hard constraints - do not change without explicit approval
 - Privacy: **this repo is PUBLIC** (decision 2026-08-28, after rewriting author
   metadata to remove a real name from history). The operative rule is therefore
   absolute: nothing identity-bearing may ever enter this repo. No real name, no
@@ -58,7 +58,7 @@ environment variable. The contract, in precedence order:
   (self-hosted assets only; img-src does NOT allow https://*). HTTP-only headers
   live in static/_headers; HSTS is set in the Cloudflare dashboard (SSL/TLS ->
   Edge Certificates), never in _headers.
-- [markdown.highlighting] style = "class" — required so style-src needs no
+- [markdown.highlighting] style = "class" - required so style-src needs no
   'unsafe-inline'. Do not switch to style = "inline"; it writes a style attribute onto
   every syntax token. (Pre-0.22 this key was highlight_theme = "css".)
 - TOML ordering in config.toml: every bare key in [extra] MUST appear before the first
@@ -74,9 +74,9 @@ This host has podman, not docker, and no local zola/wrangler binary. Substitute
 `docker` for `podman` on hosts that have it; the image and flags are identical.
 - Local preview: podman run -u "$(id -u):$(id -g)" -v $PWD:/app --workdir /app -p 8080:8080 --rm ghcr.io/getzola/zola:v0.22.1 serve --interface 0.0.0.0 --port 8080 --base-url localhost --drafts
 - Build: podman run --rm --security-opt label=disable -v $PWD:/app -w /app ghcr.io/getzola/zola:v0.22.1 build
-- Deploy: push to main (CI) — avoid manual `wrangler deploy` outside CI.
+- Deploy: push to main (CI) - avoid manual `wrangler deploy` outside CI.
 
-## Verification — the build lies by exiting 0
+## Verification - the build lies by exiting 0
 A successful `zola build` proves nothing about the config taking effect. After any
 config.toml change, check the built artifact, not the source:
 - CSP actually emitted: `grep -o 'Content-Security-Policy[^>]*' public/index.html`
@@ -87,7 +87,7 @@ config.toml change, check the built artifact, not the source:
   unreferenced assets). Harmless; do not wire them up without removing tabi's own
   sass/parts/_syntax_theme.scss first, or the two will fight.
 
-## Authoring workflow — generated assets are committed, not built in CI
+## Authoring workflow - generated assets are committed, not built in CI
 Both generators run locally and their output is committed. CI stays hermetic: no npm,
 no browser, no network beyond the pinned Zola tarball. Run them before committing.
 - **New or retitled page** -> `python3 scripts/render-social-cards.py` (add `--force`
@@ -118,6 +118,12 @@ no browser, no network beyond the pinned Zola tarball. Run them before committin
   bare `[extra]` key, same rule as config.toml.
 - One-line shell commands in docs and scripts. Prefer system mechanisms over ad-hoc
   workarounds. Full-file examples over partial snippets.
+- No em dashes (U+2014) anywhere in this repo, prose or comments. Use a spaced hyphen:
+  `word - word`. At the start of a line a bare `- ` renders as a list item, so when a
+  sentence wraps put the hyphen at the end of the previous line. Gated in
+  `scripts/verify-build.sh` against the BUILT pages, not the source, because
+  `smart_punctuation = true` makes Zola render a literal `---` in prose as an em dash:
+  clean source does not imply a clean site.
 - Validate config keys against upstream docs before changing:
   tabi: https://welpo.github.io/tabi/blog/mastering-tabi-settings/
   Zola: https://www.getzola.org/documentation/

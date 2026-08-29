@@ -1,4 +1,4 @@
-# config.toml — Zola v0.22.1 + tabi theme, linuxgroot.net
+# config.toml - Zola v0.22.1 + tabi theme, linuxgroot.net
 #
 # Dependency chain:
 #   Zola reads this file -> loads theme from themes/tabi (git submodule, pinned to a
@@ -9,7 +9,7 @@
 
 base_url = "https://linuxgroot.net"
 title = "LinuxGroot"
-description = "Linux, HPC, and AI infrastructure — practical notes for engineers and researchers who run GPU workloads"
+description = "Linux, HPC, and AI infrastructure - practical notes for engineers and researchers who run GPU workloads"
 default_language = "en"
 theme = "tabi"
 

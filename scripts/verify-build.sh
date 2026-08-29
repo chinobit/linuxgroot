@@ -11,7 +11,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 fail() { echo "FAIL: $1" >&2; exit 1; }
 
-[ -f public/index.html ] || fail "public/index.html missing — build first"
+[ -f public/index.html ] || fail "public/index.html missing - build first"
 
 pages=$(find public -name '*.html' -type f | sort)
 [ -n "$pages" ] || fail "no HTML pages found in public/"
@@ -29,10 +29,10 @@ for f in $pages; do
     fi
     csp=$(grep -o "default-src[^\"]*" "$f" | head -1 || true)
     [ -n "$csp" ] || fail "no CSP emitted on ${f#public/}"
-    case "$csp" in *"https://*"*) fail "wildcard host (https://*) in CSP on ${f#public/} — the extra.hcard ordering bug is back";; esac
+    case "$csp" in *"https://*"*) fail "wildcard host (https://*) in CSP on ${f#public/} - the extra.hcard ordering bug is back";; esac
     # 'unsafe-inline' would be silently added by enabling mermaid or a comment backend
     # on a single page. Measured 2026-08-28: mermaid = true relaxes style-src page-wide.
-    case "$csp" in *unsafe-inline*) fail "unsafe-inline in CSP on ${f#public/} — a page-level feature (mermaid? comments?) relaxed the policy";; esac
+    case "$csp" in *unsafe-inline*) fail "unsafe-inline in CSP on ${f#public/} - a page-level feature (mermaid? comments?) relaxed the policy";; esac
     case "$csp" in *unsafe-eval*) fail "unsafe-eval in CSP on ${f#public/}";; esac
     case "$csp" in *"img-src 'self' data:"*) ;; *) fail "img-src is not 'self' data: on ${f#public/}";; esac
     case "$csp" in *"style-src 'self'"*) ;; *) fail "style-src does not start at 'self' on ${f#public/}";; esac
@@ -45,7 +45,7 @@ echo "CSP (homepage): $(grep -o "default-src[^\"]*" public/index.html | head -1)
 if grep -rlqE '<[a-zA-Z][^>]*[[:space:]]style=' $pages 2>/dev/null; then
   echo "offending pages:" >&2
   grep -rlE '<[a-zA-Z][^>]*[[:space:]]style=' $pages >&2 || true
-  fail "inline style= attribute in a page — highlighting fell back to inline mode, or a shortcode emitted one"
+  fail "inline style= attribute in a page - highlighting fell back to inline mode, or a shortcode emitted one"
 fi
 
 # 3. No off-site subresources. The CSP would block these at runtime, which means the
@@ -60,7 +60,7 @@ offsite=$(grep -rhoE '<(script|link|img|iframe)[^>]*>' $pages \
     | sort -u || true)
 if [ -n "$offsite" ]; then
   printf '%s\n' "$offsite" >&2
-  fail "off-site subresource in built output — the CSP would block it at runtime and the feature would fail silently"
+  fail "off-site subresource in built output - the CSP would block it at runtime and the feature would fail silently"
 fi
 
 # 4. Every blog page carries an Open Graph image. Without one, a link posted anywhere
@@ -81,11 +81,11 @@ for f in $(find public/blog -name '*.html' -type f 2>/dev/null | sort); do
         continue
     fi
     got=$(grep -oE 'social_cards/[A-Za-z0-9._-]+\.png' "$f" | head -1 || true)
-    [ -n "$got" ] || fail "no og:image on ${f#public/} — run scripts/render-social-cards.py"
+    [ -n "$got" ] || fail "no og:image on ${f#public/} - run scripts/render-social-cards.py"
     # public/blog/scheduler/what-your-job-costs/index.html -> blog-scheduler-what-your-job-costs.png
     want=$(printf '%s' "${f#public/}" | sed 's|/index\.html$||; s|\.html$||; s|/|-|g')
     [ "$got" = "social_cards/${want}.png" ] \
-        || fail "${f#public/} shows card '${got##*/}', expected '${want}.png' — it is inheriting another page's card; run scripts/render-social-cards.py"
+        || fail "${f#public/} shows card '${got##*/}', expected '${want}.png' - it is inheriting another page's card; run scripts/render-social-cards.py"
 done
 
 # 5. Zola always writes giallo-{light,dark}.css (the theme keys under
@@ -96,7 +96,7 @@ done
 #    rather than by noticing odd colours months later.
 if grep -rlq 'giallo-light\.css\|giallo-dark\.css' $pages 2>/dev/null; then
     grep -rl 'giallo-light\.css\|giallo-dark\.css' $pages >&2
-    fail "a page now links Zola's giallo CSS — it will fight tabi's own _syntax_theme.scss; remove one before shipping"
+    fail "a page now links Zola's giallo CSS - it will fight tabi's own _syntax_theme.scss; remove one before shipping"
 fi
 
 # 6. HTTP-header policies shipped for Workers to serve.
@@ -107,7 +107,7 @@ grep -q 'X-Content-Type-Options: nosniff' public/_headers || fail "_headers lost
 # 7. Privacy: the built site must not contain identifying or work-related strings.
 #
 # The patterns themselves are deliberately NOT in this file. This repo is public, so a
-# literal deny-list here would publish exactly the strings it exists to suppress — which
+# literal deny-list here would publish exactly the strings it exists to suppress - which
 # is what this script did until 2026-08-28. Patterns come from outside the repo:
 #   local: ~/.config/linuxgroot/leak-patterns   (one POSIX basic regex per line)
 #   CI:    $LEAK_PATTERNS_FILE, written from a GitHub Actions secret
@@ -122,9 +122,24 @@ if [ -f "$patterns" ] && [ -s "$patterns" ]; then
     fi
     echo "leak scan: clean against $(grep -cve '^[[:space:]]*$' "$patterns") pattern(s)"
 elif [ "${CI:-}" = "true" ]; then
-    fail "leak-pattern file missing in CI — set the LEAK_PATTERNS secret or unset this gate deliberately"
+    fail "leak-pattern file missing in CI - set the LEAK_PATTERNS secret or unset this gate deliberately"
 else
-    echo "WARNING: no leak-pattern file at $patterns — privacy scan SKIPPED" >&2
+    echo "WARNING: no leak-pattern file at $patterns - privacy scan SKIPPED" >&2
+fi
+
+# 8. No em dashes (U+2014) in published prose. House style is a spaced hyphen.
+# Gated on the ARTIFACT rather than on content/, because source cleanliness does not
+# imply output cleanliness here: config.toml has smart_punctuation = true, so Zola
+# turns a literal `---` in prose into an em dash at render time. A source-only check
+# would pass while the site served them. It also catches strings that never appear in
+# content/ at all: every em dash the site shipped before this gate existed came from
+# the site description in config.toml, reproduced into the meta and OG tags of all 25
+# pages. Scoped to HTML: public/js/{katex,mermaid}.min.js are vendored theme assets
+# whose contents are not ours to restyle.
+emdash=$(grep -rl '—' $pages 2>/dev/null || true)
+if [ -n "$emdash" ]; then
+  printf '%s\n' "$emdash" >&2
+  fail "em dash (U+2014) in published prose - house style is a spaced hyphen; check content/ and the description in config.toml"
 fi
 
 echo "OK: all build invariants hold"

@@ -1,4 +1,4 @@
-# static/_headers — parsed by Workers Static Assets, never served as an asset.
+# static/_headers - parsed by Workers Static Assets, never served as an asset.
 #
 # Dependency chain:
 #   Zola copies static/ verbatim into public/ at build time -> Workers reads

@@ -1,4 +1,4 @@
-// wrangler.jsonc — Cloudflare Workers Static Assets, linuxgroot.net
+// wrangler.jsonc - Cloudflare Workers Static Assets, linuxgroot.net
 //
 // Dependency chain:
 //   "name" matches the existing Worker "linuxgroot" -> `wrangler deploy` REPLACES the

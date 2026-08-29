@@ -1,4 +1,4 @@
-# .github/workflows/deploy.yml — build with Zola, deploy to Cloudflare Workers
+# .github/workflows/deploy.yml - build with Zola, deploy to Cloudflare Workers
 #
 # Dependency chain:
 #   push to main -> checkout WITH submodules (themes/tabi is a pinned submodule;
@@ -8,9 +8,9 @@
 #   -> cloudflare/wrangler-action reads wrangler.jsonc and deploys public/.
 #
 # Required repository secrets (Settings -> Secrets and variables -> Actions):
-#   CLOUDFLARE_API_TOKEN  — scoped token: Account -> Workers Scripts -> Edit, this
+#   CLOUDFLARE_API_TOKEN - scoped token: Account -> Workers Scripts -> Edit, this
 #                           account only. Never the Global API Key.
-#   CLOUDFLARE_ACCOUNT_ID — from Cloudflare dashboard sidebar.
+#   CLOUDFLARE_ACCOUNT_ID - from Cloudflare dashboard sidebar.
 
 name: Deploy to Cloudflare Workers
 
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (with theme submodule)
-        # Pinned by commit SHA (tag: v5) — tags are mutable, SHAs are not.
+        # Pinned by commit SHA (tag: v5) - tags are mutable, SHAs are not.
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
           submodules: true
