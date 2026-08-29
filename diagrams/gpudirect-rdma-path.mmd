@@ -1,0 +1,9 @@
+flowchart LR
+    subgraph on["with GPUDirect RDMA"]
+        direction LR
+        G2["GPU memory"] --> N2["NIC"] --> W2["wire"]
+    end
+    subgraph off["without GPUDirect RDMA"]
+        direction LR
+        G1["GPU memory"] --> H1["host bounce buffer"] --> N1["NIC"] --> W1["wire"]
+    end

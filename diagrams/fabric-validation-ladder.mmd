@@ -1,0 +1,8 @@
+flowchart TB
+    R1["1. link and fabric<br/>ibstat, ibdiagnet<br/>seconds, no allocation"] --> R2["2. NIC to NIC<br/>ib_write_bw<br/>one pair, no GPUs"]
+    R2 --> R3["3. GPU memory over the wire<br/>ib_write_bw --use_cuda<br/>proves GPUDirect RDMA"]
+    R3 --> R4["4. the collective<br/>all_reduce_perf<br/>read busbw, not algbw"]
+    R1 -.->|"stops here"| F1["negotiated rate, cabling,<br/>subnet manager, partitions"]
+    R2 -.->|"stops here"| F2["the fabric or the NIC,<br/>nothing above them"]
+    R3 -.->|"stops here"| F3["no GDR: every byte is<br/>bouncing through host memory"]
+    R4 -.->|"stops here"| F4["topology and rail selection,<br/>or NCCL never chose IB"]
