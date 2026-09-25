@@ -61,7 +61,7 @@ jobs:
         # the runner now force-upgrades to node24 with a deprecation annotation; v4.0.0
         # declares node24 natively. Its one breaking change is the default wrangler
         # version, which does not reach us because we pin that explicitly below.
-        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0
+        uses: cloudflare/wrangler-action@4e88846969242f7752bcfdaf5511bfbb3985ca47
         with:
           # v4 defaults to wrangler `latest`, and "latest" is not a version: an upstream
           # release would change what this workflow deploys with, without a commit here.
