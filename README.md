@@ -2,7 +2,7 @@
 
 Source for [linuxgroot.net](https://linuxgroot.net): a static site built with
 [Zola](https://www.getzola.org) v0.22.1 and the [tabi](https://github.com/welpo/tabi)
-theme, deployed to Cloudflare Workers Static Assets by GitHub Actions on push to `main`.
+theme.
 
 The theme is a git submodule pinned to a release tag, so clone with:
 
@@ -38,5 +38,3 @@ Two generators run locally and their output is committed, so CI stays hermetic:
   Chromium) to render its Open Graph card and set `social_media_card` in front matter.
 - Edited a diagram: `bash scripts/render-diagrams.sh` after changing `diagrams/*.mmd`,
   then commit the `.mmd` and the generated `static/diagrams/*.svg`.
-
-See `CLAUDE.md` for the project's architecture, privacy and security constraints.
